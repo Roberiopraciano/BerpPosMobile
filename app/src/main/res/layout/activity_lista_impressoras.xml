@@ -1,0 +1,55 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.mobile.berp.BerpPOSMobile.ListaImpressorasActivity">
+
+    <!-- Ícone de Impressora -->
+    <ImageView
+        android:id="@+id/iconPrinter"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:src="@drawable/printer"
+        android:contentDescription="@string/impressora" />
+
+    <!-- Texto "Imprimir em:" -->
+    <TextView
+        android:id="@+id/tvImprimirEm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="25sp"
+        android:layout_toEndOf="@id/iconPrinter"
+        android:layout_alignTop="@id/iconPrinter"
+        android:layout_marginStart="8dp"
+        android:paddingBottom="16dp"
+        android:text="Imprimir em:" />
+
+    <!-- Lista de Impressoras -->
+    <ListView
+        android:id="@+id/listImp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvImprimirEm"
+        android:layout_above="@+id/layoutbotton"
+        android:dividerHeight="1dp" />
+
+    <!-- Botão de Voltar -->
+    <LinearLayout
+        android:id="@+id/layoutbotton"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+
+        <Button
+            android:id="@+id/btnVoltarImp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ripple_effect2"
+            android:textColor="@color/TextButtonColor"
+            android:text="@string/voltar" />
+    </LinearLayout>
+
+</RelativeLayout>

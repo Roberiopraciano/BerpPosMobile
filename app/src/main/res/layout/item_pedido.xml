@@ -1,0 +1,77 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp">
+
+        <!-- Linha de Dados do Produto -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="4dp">
+
+                <TextView
+                    android:id="@+id/codprodutopedido_item"
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/backgroundcolor"
+                    android:textStyle="bold"
+                    tools:text="12345" />
+
+                <TextView
+                    android:id="@+id/qtdprodutopedido"
+                    android:layout_width="40dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/backgroundcolor"
+                    android:textStyle="bold"
+                    tools:text="2" />
+
+                <TextView
+                    android:id="@+id/descprodutopedido"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textColor="@color/backgroundcolor"
+                    android:textStyle="bold"
+                    tools:text="Produto Exemplo" />
+
+                <TextView
+                    android:id="@+id/valorunitprodutopedido"
+                    android:layout_width="70dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/backgroundcolor"
+                    android:textStyle="bold"
+                    android:gravity="end"
+                    tools:text="R$ 10.00" />
+
+                <TextView
+                    android:id="@+id/valortotalprodutopedido"
+                    android:layout_width="80dp"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/backgroundcolor"
+                    android:textStyle="bold"
+                    android:gravity="end"
+                    tools:text="R$ 20.00" />
+        </LinearLayout>
+
+        <!-- Linha de Observação -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="2dp">
+
+                <TextView
+                    android:id="@+id/obsprodutopedido"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="2dp"
+                    android:textColor="@color/backgroundcolor"
+                    android:textStyle="italic"
+                    tools:text="Observação: Produto fresco." />
+        </LinearLayout>
+</LinearLayout>

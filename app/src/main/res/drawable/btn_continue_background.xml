@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Quando desabilitado, o background será cinza -->
+    <item android:state_enabled="false" android:drawable="@color/gray" />
+    <!-- Quando habilitado, o background será amarelo (ou sua cor normal) -->
+    <item android:drawable="@color/yello" />
+</selector>

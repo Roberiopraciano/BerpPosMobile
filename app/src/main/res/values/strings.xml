@@ -1,0 +1,88 @@
+<resources>
+    <string name="app_name">BerpPosMobile</string>
+    <string name="version">Versão 2.2.14</string>
+    <string name="iniciar">Iniciar</string>
+    <string name="configurar">Configurar</string>
+    <string name="voltar">Voltar</string>
+    <string name="salvar">Salvar</string>
+    <string name="entrar">Entrar</string>
+    <string name="senha">Senha</string>
+    <string name="usuario">Usuário</string>
+    <string name="mesa">Atendimento</string>
+    <string name="valor">Valor</string>
+    <string name="lancamento_item_simples">Simples</string>
+    <string name="lancamento_item_combinado">Combinado</string>
+    <string-array name="pagamentos_array">
+        <item>Dinheiro</item>
+        <item>Cartão Debito</item>
+        <item>Cartão Credito</item>
+        <item>Voucher</item>
+        <item>Pagamento Instantaneo</item>
+        <item>Pix </item>
+
+
+    </string-array>
+    <string name="fechar">Fechar</string>
+    <string name="title_activity_login">Sign in</string>
+    <string name="contentdescriptionbtninfo">Direciona para a tela de informações do aplicativo</string>
+    <string name="opcoes">Opções</string>
+    <string name="btn_label_qr_code">Ler Qr Code</string>
+    <string name="label_imp_pos">Imprimir no POS</string>
+    <string name="label_ip_servidor">Endereço Ip do Servidor</string>
+    <string name="label_porta">Porta</string>
+    <string name="label_numterminal">Número do terminal</string>
+    <string name="label_pagamento">Pagamento</string>
+    <string name="label_detalhado">Ver Detalhado</string>
+    <string name="label_simples">Ver Simples</string>
+    <string name="btn_label_imp_conta">Imprimir Conta</string>
+    <string name="btn_label_lancar_itens">Lançar Itens</string>
+    <string name="label_atendente">Atendente</string>
+    <string name="label_hora">Hora</string>
+    <string name="label_sair">Sair</string>
+    <string name="btn_label_efetua_pagamento">Efetuar Pagamento</string>
+    <string name="btn_label_conta">Conta</string>
+    <string name="btn_label_list_mesas">Listar Atendimentos</string>
+    <string name="label_codigo">Código</string>
+    <string name="label_descricao">Descrição</string>
+    <string name="label_obs">Observação</string>
+    <string name="btn_label_add_item">Adicionar Item</string>
+    <string name="btn_label_limpar">Limpar</string>
+    <string name="btn_label_ver_pedido">Ver Pedido</string>
+    <string name="label_num_mesa">Numero da Mesa</string>
+    <string name="btn_label_continuar">Continuar</string>
+    <string name="btn_label_finalizar">Finalizar</string>
+    <string name="btn_label_enviar_pedido">Enviar Pedido</string>
+    <string name="label_identifica">Identificação</string>
+    <string name="label_identifica_cliente">Identificação do cliente</string>
+    <string name="scheme_return">berpstoneTest</string>
+    <string name="_004">004</string>
+    <string name="cod">Cod</string>
+    <string name="descri_o">Descrição</string>
+    <string name="qtd">Qtd</string>
+    <string name="vlr_unit">Vlr.unit</string>
+    <string name="vlr_tot">Vlr.tot</string>
+    <string name="pessoas">Pessoas:</string>
+    <string name="quantidade">Quantidade:</string>
+    <string name="manter_logado">Permanecer Logado</string>
+    <string name="hint_local_entrega">"Local Entrega"</string>
+    <string name="hint_nome_cliente">Nome</string>
+    <string name="descricao_filtro" />
+    <string name="descricao_ordenacao" />
+    <string name="btn_voltar" >Voltar</string>
+    <string name="btn_mostrar_todos">Mostrar Todos</string>
+    <string name="logo_berp" />
+    <string name="balcao">Atendimento Balcao</string>
+    <string name="cartao">Atendimento Cartao</string>
+    <string name="mesas">Atendimento Mesa</string>
+    <string name="switch_mesa">Mesas</string>
+    <string name="switch_cartao">Cartoes</string>
+    <string name="switch_balcao">Balcoes</string>
+    <string name="hint_pesquisa_atendimentos">Pesquisa</string>
+    <string name="clear_filter">limpar Filtro</string>
+    <string name="switch_Delivery">Delivery</string>
+    <string name="venda_tipo">imagemmodalidade</string>
+    <string name="btn_label_cancelar_pedido">Cancelar Pedido</string>
+    <string name="impressora">Selecione Impressora\n</string>
+    <string name="habilitar_rastreamento">Habilitar Rastreamento</string>
+    <string name="device_id_n_a">Device ID: N/A</string>
+</resources>

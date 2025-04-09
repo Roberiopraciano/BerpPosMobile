@@ -1,0 +1,156 @@
+
+
+plugins {
+    id 'com.android.application'
+
+}
+
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-parcelize'
+
+
+android {
+    compileSdkVersion 35
+    defaultConfig {
+        applicationId 'com.mobile.berp.BerpPosMobile'
+        minSdkVersion 25
+        targetSdkVersion 34
+        versionCode 32
+        versionName '2.3.15'
+        multiDexEnabled true
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
+
+
+
+    }
+    signingConfigs {
+        release {
+            storeFile file('/Users/roberiobezerrapraciano/Desktop/Berp_Dev/berpsistemasChavePlaystore2025')
+            storePassword 'rqqo231'
+            keyAlias 'key0'
+            keyPassword 'rqqo231'
+        }
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+
+    flavorDimensions "default"
+
+    productFlavors {
+        getnet {
+            applicationIdSuffix ".getnet"
+            buildConfigField "String", "POS_MODEL", "\"getnet\""
+        }
+        stone {
+            applicationIdSuffix ".stone"
+            buildConfigField "String", "POS_MODEL", "\"stone\""
+        }
+        pagseguro {
+            applicationIdSuffix ".pagseguro"
+            buildConfigField "String", "POS_MODEL", "\"pagseguro\""
+        }
+        cielo {
+            applicationIdSuffix ".cielo"
+            buildConfigField "String", "POS_MODEL", "\"cielo\""
+        }
+        sitef {
+            applicationIdSuffix ".sitef"
+            buildConfigField "String", "POS_MODEL", "\"sitef\""
+        }
+        rede {
+            applicationIdSuffix ".rede"
+            buildConfigField "String", "POS_MODEL", "\"rede\""
+        }
+        quickpay {
+            applicationIdSuffix ".quickpay"
+            buildConfigField "String", "POS_MODEL", "\"quickpay\""
+        }
+        celular {
+
+            buildConfigField "String", "POS_MODEL", "\"celular\""
+        }
+    }
+
+
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+
+
+
+
+        }
+
+        debug {
+            jniDebuggable true
+            debuggable true
+          //  signingConfig signingConfigs.debug
+        }
+    }
+    namespace 'com.mobile.berp.BerpPosMobile'
+}
+
+dependencies {
+
+
+    celularImplementation 'com.google.android.play:app-update:2.1.0'
+
+
+    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support.constraint:constraint-layout:2.0.4'
+    implementation 'androidx.recyclerview:recyclerview:1.4.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'javax.annotation:javax.annotation-api:1.3.2'
+    implementation 'com.google.android.material:material:1.12.0'
+    implementation 'com.android.support:design:28.0.0'
+    implementation 'androidx.activity:activity-ktx:1.10.1'
+        // Retrofit
+        implementation 'com.squareup.retrofit2:retrofit:2.11.0'
+        implementation 'com.squareup.retrofit2:converter-gson:2.11.0'
+
+        // OkHttp e Interceptor de logging
+        implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+        implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
+
+
+
+    implementation 'com.android.support:design:28.0.0'
+    implementation 'androidx.test.ext:junit:1.2.1'
+    implementation 'androidx.lifecycle:lifecycle-process:2.8.7'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    implementation 'com.google.code.gson:gson:2.11.0'
+
+    implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
+
+    implementation 'com.google.zxing:core:3.5.3'
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
+
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.8.7"
+    implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
+    implementation "com.airbnb.android:lottie:6.1.0"
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.21'
+    // Dependência do RxJava (caso ainda não tenha)
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.21'
+
+    // Dependência do RxAndroid
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+
+    pagseguroImplementation 'br.com.uol.pagseguro.plugpagservice.wrapper:wrapper:1.29.5'
+
+}

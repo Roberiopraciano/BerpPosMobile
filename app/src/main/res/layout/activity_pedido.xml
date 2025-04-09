@@ -1,0 +1,206 @@
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/darkblu2"
+    tools:context="com.mobile.berp.BerpPOSMobile.PedidoActivity">
+
+    <!-- Botão Cancelar Pedido -->
+    <Button
+        android:id="@+id/btnCancelarPedido"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="2dp"
+        android:padding="5dp"
+        android:background="@drawable/ripple_effect2"
+        android:text="@string/btn_label_cancelar_pedido"
+        android:textColor="@color/TextButtonColor" />
+
+    <!-- Header da conta -->
+
+
+
+
+
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp"
+        android:layout_marginBottom="5dp"
+        android:background="#3f51b5"
+        android:layout_below="@id/btnCancelarPedido"
+        android:weightSum="5">
+
+        <TextView
+            android:textColor="@color/backgroundcolor"
+            android:text="Cod."
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:gravity="start"
+            android:paddingEnd="5dp"
+            android:fontFamily="monospace" />
+
+        <TextView
+            android:textColor="@color/backgroundcolor"
+            android:text="Qtd."
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:gravity="center"
+            android:paddingEnd="5dp"
+            android:fontFamily="monospace" />
+
+        <TextView
+            android:textColor="@color/backgroundcolor"
+            android:text="Desc."
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:gravity="center"
+            android:paddingEnd="5dp"
+            android:fontFamily="monospace" />
+
+        <TextView
+            android:textColor="@color/backgroundcolor"
+            android:text="VUni."
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:gravity="center"
+            android:paddingEnd="5dp"
+            android:fontFamily="monospace" />
+
+        <TextView
+            android:textColor="@color/backgroundcolor"
+            android:text="Total"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:gravity="end"
+            android:paddingStart="5dp"
+            android:fontFamily="monospace" />
+    </LinearLayout>
+
+    <!-- Lista de produtos -->
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:id="@+id/list_prods"
+        android:divider="@android:color/darker_gray"
+        android:dividerHeight="1dp"
+        android:layout_above="@+id/linearSummary"
+        android:layout_below="@+id/linearLayout1"
+        android:background="@color/darkblu2" />
+
+    <!-- Resumo do total -->
+    <LinearLayout
+        android:id="@+id/linearSummary"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/linearbottonbuttons"
+        android:orientation="vertical"
+        android:padding="10dp"
+        android:background="#3f51b5">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingTop="10dp">
+
+            <TextView
+                android:textColor="@color/backgroundcolor"
+                android:text="Total:"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:fontFamily="monospace"
+                android:gravity="end" />
+
+            <TextView
+                android:id="@+id/txtTotalPedido"
+                android:textColor="@color/backgroundcolor"
+                android:text="R$ 0.00"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:fontFamily="monospace"
+                android:gravity="start"
+                android:paddingStart="10dp" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottieLoading"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/anim6"/>
+
+    <TextView
+        android:id="@+id/loadingMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@id/lottieLoading"
+        android:visibility="gone"
+
+        android:text="Enviando pedido, por favor aguarde..."
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:paddingTop="10dp"  />
+
+    <!-- Botões de ação -->
+    <LinearLayout
+        android:id="@+id/linearbottonbuttons"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:padding="10dp"
+        android:weightSum="2"
+        android:background="#3f51b5">
+
+        <Button
+            android:id="@+id/btnAddItem"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/ripple_effect"
+            android:text="@string/btn_label_add_item"
+            android:textColor="@color/TextButtonColor" />
+
+        <Button
+            android:id="@+id/btnEnviarPedido"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/ripple_effect"
+            android:text="@string/btn_label_enviar_pedido"
+            android:textColor="@color/TextButtonColor" />
+    </LinearLayout>
+
+</RelativeLayout>

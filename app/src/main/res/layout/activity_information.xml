@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/logo_para_web5"
+    tools:context="com.mobile.berp.BerpPOSMobile.InformationActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center|top"
+        android:layout_marginTop="75dp"
+        >
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Berp POS"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:textColor="@color/yello"
+            />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/version"
+            android:padding="25dp"
+            android:textColor="@color/yello" />
+
+        <TextView
+            android:id="@+id/tvanosistema"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="2005-2019 Berp Sistemas"
+            android:textColor="@color/yello" />
+
+        <TextView
+            android:id="@+id/txtVf"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Todos os Direitos Reservados"
+            android:textColor="@color/yello"
+            android:paddingBottom="40dp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center|bottom"
+        android:paddingTop="100dp">
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="(85) 3082-9606"
+        android:textColor="@color/yello" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="suporteberp@hotmail.com"
+        android:textColor="@color/yello" />
+
+    <TextView
+        android:id="@+id/textView7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="www.berpsistemas.com.br"
+        android:textColor="@color/yello" />
+
+</LinearLayout>
+
+</LinearLayout>

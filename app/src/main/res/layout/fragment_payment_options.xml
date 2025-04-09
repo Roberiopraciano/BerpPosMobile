@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="16dp"
+    android:orientation="vertical"
+    android:background="@color/darkblue2">
+
+    <!-- Exibe o identificador do pagamento e o valor -->
+    <TextView
+        android:id="@+id/tv_payment_details"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Pagamento #1234 - Valor: R$150,00"
+        android:textSize="16sp"
+        android:textColor="@android:color/white"
+        android:layout_gravity="center_horizontal"
+        android:padding="8dp"/>
+
+    <!-- Pergunta -->
+    <TextView
+        android:id="@+id/tv_question"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Selecione a forma de pagamento"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_gravity="center_horizontal"
+        android:padding="8dp"/>
+
+    <!-- Botões com ícones e conteúdo centralizado -->
+    <Button
+        android:id="@+id/btn_dinheiro"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textAlignment="center"
+        android:drawableLeft="@drawable/icmoney"
+        android:drawablePadding="8dp"
+        android:text="Dinheiro"
+        android:layout_marginTop="8dp"/>
+
+    <Button
+        android:id="@+id/btn_credito"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textAlignment="center"
+        android:drawableLeft="@drawable/ic_credit"
+        android:drawablePadding="8dp"
+        android:text="Cartão Crédito"
+        android:layout_marginTop="8dp"/>
+
+    <Button
+        android:id="@+id/btn_debito"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textAlignment="center"
+        android:drawableLeft="@drawable/icdebit"
+        android:drawablePadding="8dp"
+        android:text="Cartão Débito"
+        android:layout_marginTop="8dp"/>
+
+    <Button
+        android:id="@+id/btn_pix"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textAlignment="center"
+        android:drawableLeft="@drawable/icpix"
+        android:drawablePadding="8dp"
+        android:text="Pix"
+        android:layout_marginTop="8dp"/>
+
+    <Button
+        android:id="@+id/btn_cancel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/gray"
+        android:gravity="center"
+        android:textAlignment="center"
+        android:drawablePadding="8dp"
+        android:text="Cancelar"
+        android:layout_marginTop="24dp"/>
+</LinearLayout>

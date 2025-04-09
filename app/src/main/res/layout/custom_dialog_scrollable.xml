@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="18dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/textView4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="A Berp Sistemas ME construiu o Berp Mobile Pos como um aplicativo comercial. Este SERVIÇO é fornecido pela Berp sistemas e é destinado para uso como é.\n"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Esta página é usada para informar  os visitantes sobre nossas políticas com a coleta, uso e divulgação de Informações Pessoais, se alguém decidir usar o nosso Serviço.\n"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Se você optar por usar nosso   Serviço, você concorda com a coleta   e uso de informações em relação a esta política.\n"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="As Informações Pessoais que coletamos são usadas para fornecer e melhorando o serviço.\n"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Não usaremos ou  compartilharemos suas informações com ninguém, exceto conforme descrito nesta Política de Privacidade Privacidade.\n"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Os termos usados nesta Política de Privacidade têm os mesmos significados que em nossos Termos e Condições, qual é acessível em Berp Mobile Pos.\n"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Coleta e Uso de Informações Para uma melhor experiência, ao usar nosso Serviço, podemos exigir que você nos forneça informação pessoalmente identificável. As informações que solicitamos serão retidas por nós e usado conforme descrito nesta política de    privacidade.\n"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="O aplicativo usa serviços de terceiros que podem coletar informações usadas para identifica lo.\n"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Link para a política de privacidade Politica de Privacidade de provedores de serviços de terceiros usados pelo aplicativo\n"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="- Crashlytics (http://try.crashlytics.com/terms/privacy-policy.pdf)\n"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Segurança\n"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Valorizamos sua confiança em nos fornecer suas informações pessoais, por isso estamos nos esforçando usar meios comercialmente aceitáveis de Segurança."/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Valorizamos sua confiança em nos fornecer suas informações pessoais, por isso estamos nos esforçando usar meios comercialmente aceitáveis de protegê-lo.\n"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Mas lembre-se que nenhum método de transmissão sobre a internet, ou método de armazenamento eletrônico é 100% seguro e confiável, e não podemos garantir sua segurança absoluta."/>
+
+    </LinearLayout>
+
+</ScrollView>

@@ -1,0 +1,411 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/darkblu2"
+    tools:context="com.mobile.berp.BerpPOSMobile.ContaActivity">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/relative">
+
+        <LinearLayout
+            style="?android:attr/buttonBarStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:id="@+id/layouttopbutton"
+            android:gravity="center|top">
+
+            <Button
+                android:id="@+id/btntipoconta"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/orang"
+                android:textColor="@color/TextButtonColor"
+                android:text="@string/label_detalhado" />
+
+            <Button
+                android:id="@+id/btnpargarConta"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/orang"
+                android:textColor="@color/TextButtonColor"
+                android:text="@string/label_pagamento" />
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/RelativeHide"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:animateLayoutChanges="true"
+            android:padding="6dp" >
+
+            <TextView
+                android:id="@+id/txtAtendimento"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="17dp"
+                android:layout_toEndOf="@+id/lblAtendimento"
+                android:text="0" />
+
+            <TextView
+                android:id="@+id/lblAtendente"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/lblAtendimento"
+                android:text="Garçom:" />
+
+            <TextView
+                android:id="@+id/lblAtendimento"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:text="Mesa:" />
+
+            <TextView
+                android:id="@+id/txtHoraAt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/txtAtendimento"
+                android:layout_alignBottom="@+id/txtAtendimento"
+                android:layout_alignParentEnd="true"
+                android:text="00:00h" />
+
+            <TextView
+                android:id="@+id/lblHoraAt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/txtHoraAt"
+                android:layout_alignBottom="@+id/txtHoraAt"
+                android:layout_marginEnd="25dp"
+                android:layout_toStartOf="@+id/txtHoraAt"
+                android:text="Abertura:" />
+
+            <TextView
+                android:id="@+id/txtAtendente"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/lblAtendente"
+                android:layout_alignBottom="@+id/lblAtendente"
+                android:layout_alignStart="@+id/txtAtendimento"
+                android:text="Berp" />
+
+            <TextView
+                android:id="@+id/tvStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/txtAtendente"
+                android:layout_alignBottom="@+id/txtAtendente"
+                android:layout_alignEnd="@+id/txtHoraAt"
+                android:text="Fechado" />
+
+            <TextView
+                android:id="@+id/lblStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@+id/tvStatus"
+                android:layout_alignBottom="@+id/tvStatus"
+                android:layout_alignEnd="@+id/lblHoraAt"
+                android:text="Status:" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#3f51b5"
+            android:paddingLeft="6dp"
+            android:paddingRight="6dp" >
+
+            <TextView
+                android:id="@+id/tvCoditemConta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:text="@string/cod"
+                android:textColor="@color/backgroundcolor"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvDescitemConta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginStart="100dp"
+                android:text="@string/descri_o"
+                android:textColor="@color/backgroundcolor"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvQTDitemConta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/tvCoditemConta"
+                android:layout_below="@+id/tvCoditemConta"
+                android:text="@string/qtd"
+                android:textColor="@color/backgroundcolor"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvValUnititemConta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignStart="@+id/tvDescitemConta"
+                android:layout_alignParentStart="false"
+                android:layout_alignParentTop="false"
+                android:layout_below="@+id/tvDescitemConta"
+                android:text="@string/vlr_unit"
+                android:textColor="@color/backgroundcolor"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvAtenditemConta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/tvQTDitemConta"
+                android:text="@string/label_atendente"
+                android:textColor="@color/backgroundcolor"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvVLRTOTitemConta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@id/tvValUnititemConta"
+                android:layout_alignParentStart="false"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:text="@string/vlr_tot"
+                android:textColor="@color/backgroundcolor"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvHoraitemConta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBaseline="@id/tvAtenditemConta"
+                android:layout_alignParentEnd="true"
+                android:layout_below="@+id/tvVLRTOTitemConta"
+                android:text="@string/label_hora"
+                android:textColor="@color/backgroundcolor"
+                android:textStyle="bold" />
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/listPedidoCONTA"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/darkblu2"
+        android:layout_above="@+id/linearLayout4"
+        android:layout_below="@+id/relative"
+        android:dividerHeight="1dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:id="@+id/linearLayout4"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#3f51b5"
+            android:orientation="horizontal" >
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textColor="@color/backgroundcolor"
+                    android:text="@string/pessoas"/>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/decrease"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="Adicionar"
+                        android:src="@mipmap/ic_remove"
+                        />
+
+                    <TextView
+                        android:id="@+id/integer_number"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp"
+                        android:layout_marginLeft="4dp"
+                        android:layout_marginRight="4dp"
+                        android:layout_marginTop="16dp"
+                        android:text="1"
+                        android:textStyle="bold"
+                        android:textSize="20sp" />
+
+                    <com.google.android.material.floatingactionbutton.FloatingActionButton
+                        android:id="@+id/increase"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:contentDescription="Adcionar"
+                        android:src="@mipmap/ic_add"/>
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:id="@+id/txtvlrContaDiv"
+                    android:textColor="@color/backgroundcolor"
+                    android:text="Cada: R$45,80"/>
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/lblSubTotal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/backgroundcolor"
+                    android:text="Sub Total:" />
+
+                <TextView
+                    android:id="@+id/txtSubTotalConta"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_toEndOf="@+id/lblSubTotal"
+                    android:textColor="@color/backgroundcolor"
+                    android:text="R$ 0,00" />
+
+                <TextView
+                    android:id="@+id/lblServi"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/lblSubTotal"
+                    android:textColor="@color/backgroundcolor"
+                    android:text="Serviço:" />
+
+                <TextView
+                    android:id="@+id/txtServiConta"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@+id/lblServi"
+                    android:layout_alignStart="@+id/txtSubTotalConta"
+                    android:layout_below="@+id/txtSubTotalConta"
+                    android:textColor="@color/backgroundcolor"
+                    android:text="R$ 0,00" />
+
+                <TextView
+                    android:id="@+id/lblDesc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/lblServi"
+                    android:textColor="@color/backgroundcolor"
+                    android:text="Desconto:" />
+
+                <TextView
+                    android:id="@+id/txtDesccConta"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignStart="@+id/txtServiConta"
+                    android:layout_below="@+id/txtServiConta"
+                    android:textColor="@color/backgroundcolor"
+                    android:text="R$ 0,00" />
+
+                <TextView
+                    android:id="@+id/lblTotal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/lblDesc"
+                    android:text="Total:"
+                    android:textSize="17sp"
+                    android:textColor="@color/backgroundcolor"
+                    android:textStyle="bold" />
+
+
+                <TextView
+                    android:id="@+id/txtValorConta"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/txtDesccConta"
+                    android:layout_marginStart="5dp"
+                    android:layout_toEndOf="@+id/lblTotal"
+                    android:text="R$0,00"
+                    android:textColor="@color/backgroundcolor"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+            </RelativeLayout>
+        </LinearLayout>
+
+
+        <LinearLayout
+            style="?android:attr/buttonBarStyle"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <Button
+                android:id="@+id/btnVoltarConta"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/orang"
+                android:textColor="@color/TextButtonColor"
+                android:text="@string/voltar" />
+
+            <Button
+                android:id="@+id/btnFecharConta"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/orang"
+                android:textColor="@color/TextButtonColor"
+                android:text="@string/btn_label_imp_conta" />
+
+            <Button
+                android:id="@+id/btnLancaItemConta"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@color/orang"
+                android:textColor="@color/TextButtonColor"
+                android:text="@string/btn_label_lancar_itens" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</RelativeLayout>
