@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@color/cardview_dark_background">
+
+    <TextView
+        android:id="@+id/tvSummaryTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Resumo da Operação"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        android:textAlignment="center"
+        android:layout_marginBottom="20dp" />
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp"
+        app:cardBackgroundColor="@color/darkblue2">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/tvPaymentType"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tipo: Crédito"
+                android:textAlignment="textEnd"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:layout_marginBottom="8dp"
+                android:drawableStart="@android:drawable/ic_menu_agenda"
+                android:drawablePadding="8dp"
+                android:drawableTint="@color/orang" />
+
+            <TextView
+                android:id="@+id/tvAmount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="textEnd"
+                android:text="Valor: R$ 25,90"
+                android:textSize="22sp"
+                android:textStyle="bold"
+                android:textColor="@color/orang"
+                android:layout_marginBottom="8dp"
+                android:drawableStart="@android:drawable/ic_menu_sort_by_size"
+                android:drawablePadding="8dp"
+                android:drawableTint="@color/orang" />
+
+            <TextView
+                android:id="@+id/tvInstallments"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Parcelas: 3x"
+                android:textSize="14sp"
+                android:textColor="@android:color/white"
+                android:layout_marginBottom="8dp"
+                android:drawableStart="@android:drawable/ic_menu_sort_alphabetically"
+                android:drawablePadding="8dp"
+                android:drawableTint="@color/yello"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tvCardBrand"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Bandeira: Visa"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"
+                android:layout_marginBottom="8dp"
+                android:drawableStart="@android:drawable/ic_menu_gallery"
+                android:drawablePadding="8dp"
+                android:drawableTint="@color/yello"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/tvDateTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Data/Hora: 06/06/2025 14:30:15"
+                android:textSize="10sp"
+                android:textColor="@color/gray"
+                android:drawableStart="@android:drawable/ic_menu_recent_history"
+                android:drawablePadding="8dp"
+                android:drawableTint="@color/gray" />
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginEnd="4dp"
+            android:text="Cancelar"
+            android:textSize="12sp"
+            android:background="@drawable/ripple_effect2"
+            android:textColor="@color/TextButtonColor"
+            android:padding="8dp" />
+
+        <Button
+            android:id="@+id/btnConfirm"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="4dp"
+            android:text="Confirmar"
+            android:textSize="12sp"
+
+            android:background="@drawable/ripple_effect2"
+            android:textColor="@color/TextButtonColor"
+            android:padding="8dp" />
+
+    </LinearLayout>
+
+</LinearLayout>

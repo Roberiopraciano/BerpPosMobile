@@ -1,0 +1,75 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="br.com.berpsistemas.BerpPOSMobile">
+
+    <queries>
+    <!-- Stone POS Android - Apps principais -->
+    <package android:name="br.com.stone.posandroid.acquirerapp" />
+    <package android:name="br.com.stone.posandroid.launcherapp" />
+    <package android:name="br.com.stone.posandroid.posdeeplink" />
+
+    <!-- Stone POS Android - Apps de funcionalidades -->
+    <package android:name="br.com.stone.posandroid.reprintapp" />
+    <package android:name="br.com.stone.posandroid.activationapp" />
+    <package android:name="br.com.stone.posandroid.settingsapp" />
+    <package android:name="br.com.stone.posandroid.pixapp" />
+    <package android:name="br.com.stone.posandroid.pdtapp" />
+    <package android:name="br.com.stone.posandroid.support" />
+    <package android:name="br.com.stone.posandroid.salesimulatorapp" />
+    <package android:name="br.com.stone.posandroid.newsapp" />
+    <package android:name="br.com.stone.posandroid.reportapp" />
+    <package android:name="br.com.stone.posandroid.ravapp" />
+    <package android:name="br.com.stone.posandroid.checkupapp" />
+
+    <!-- Stone POS Android - Serviços e containers -->
+    <package android:name="br.com.stone.posandroid.service.container" />
+    <package android:name="br.com.stone.posandroid.poireport.service" />
+    <package android:name="br.com.stone.posandroid.datacontainer" />
+    <package android:name="br.com.stone.posandroid.net" />
+    <package android:name="br.com.stone.posandroid.pdm" />
+    <package android:name="br.com.stone.posandroid.phc" />
+
+
+</queries>
+
+
+    <application>
+
+        <activity
+            android:name="br.com.berpsistemas.BerpPOSMobile.PrintCallbackActivity"
+            android:exported="true"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:host="print"
+                    android:scheme="order" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name="br.com.berpsistemas.BerpPOSMobile.PaymentCallbackActivity"
+            android:exported="true"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Callbacks principais -->
+                <data android:scheme="order" android:host="pay-response" />
+                <data android:scheme="order" android:host="cancel" />
+            </intent-filter>
+
+            <!-- Intent filter adicional para scheme berp se necessário -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="berp" />
+            </intent-filter>
+        </activity>
+
+    </application>
+
+</manifest>

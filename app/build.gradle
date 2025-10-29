@@ -1,0 +1,272 @@
+plugins {
+    id 'com.android.application'
+}
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-parcelize'
+apply plugin: 'kotlin-kapt'
+
+android {
+    namespace 'br.com.berpsistemas.BerpPOSMobile'
+    compileSdkVersion 35
+
+    defaultConfig {
+        applicationId 'br.com.berpsistemas.BerpPOSMobile'
+        versionCode 46
+        versionName '2.3.32'
+        multiDexEnabled true
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
+        // (min/target por flavor — mantidos abaixo como você tinha)
+
+        ndk { abiFilters 'armeabi-v7a', 'arm64-v8a' }
+    }
+
+    buildFeatures {
+        buildConfig = true
+        viewBinding = true  // Optional, if you use view binding
+    }
+
+
+    signingConfigs {
+        release {
+            storeFile file('/Users/roberiobezerrapraciano/Desktop/Berp_Dev/berpsistemasChavePlaystore2025')
+            storePassword 'rqqo231'
+            keyAlias 'key0'
+            keyPassword 'rqqo231'
+        }
+        // Obrigatório p/ Getnet (TecToy Sunmi P2)
+        config {
+            v1SigningEnabled true
+            v2SigningEnabled true
+            storeFile file('/Users/roberiobezerrapraciano/Desktop/Berp_Dev/berpsistemasChavePlaystore2025')
+            storePassword 'rqqo231'
+            keyAlias 'key0'
+            keyPassword 'rqqo231'
+        }
+    }
+
+    packaging {
+        jniLibs {
+            // ESTA FLAG é global; no AGP 8 não dá pra mudar por-variant
+            useLegacyPackaging = true
+        }
+        // se quiser, pode colocar recursos globais aqui também (não obrigatório)
+        // resources {
+        //     excludes += ['META-INF/*.SF', ...]
+        // }
+    }
+
+    buildFeatures { buildConfig true }
+
+    flavorDimensions "default"
+    productFlavors {
+        getnet {
+            applicationIdSuffix ".getnet"
+            buildConfigField "String", "POS_MODEL", "\"getnet\""
+            targetSdkVersion 29
+            minSdkVersion 24
+            buildConfigField "String", "GETNET_ENVIRONMENT", "\"HOMOLOGACAO\"" // ou "PRODUCAO"
+            manifestPlaceholders = [
+                    getnetEnvironment     : "HOMOLOGACAO",
+                    usesCleartextTraffic  : "true"
+            ]
+        }
+        stone {
+            applicationIdSuffix ".stone"
+            buildConfigField "String", "POS_MODEL", "\"stone\""
+            targetSdkVersion 30
+            minSdkVersion 22
+        }
+        pagseguro {
+            applicationIdSuffix ".pagseguro"
+            buildConfigField "String", "POS_MODEL", "\"pagseguro\""
+            targetSdkVersion 29
+            minSdkVersion 24
+        }
+        cielo {
+            applicationIdSuffix ".cielo"
+            buildConfigField "String", "POS_MODEL", "\"cielo\""
+            targetSdkVersion 29
+            minSdkVersion 24
+        }
+        sitef {
+            applicationIdSuffix ".sitef"
+            buildConfigField "String", "POS_MODEL", "\"sitef\""
+            targetSdkVersion 29
+            minSdkVersion 24
+        }
+        rede {
+            applicationIdSuffix ".rede"
+            buildConfigField "String", "POS_MODEL", "\"rede\""
+            targetSdkVersion 29
+            minSdkVersion 24
+        }
+        quickpay {
+            applicationIdSuffix ".quickpay"
+            buildConfigField "String", "POS_MODEL", "\"quickpay\""
+            targetSdkVersion 29
+            minSdkVersion 24
+        }
+        celular {
+            buildConfigField "String", "POS_MODEL", "\"celular\""
+            minSdkVersion 25
+            targetSdkVersion 34
+        }
+        ifood {
+            buildConfigField "String", "POS_MODEL", "\"ifood\""
+            minSdkVersion 25
+            targetSdkVersion 34
+            manifestPlaceholders = [
+                    callbackScheme: "berppos",
+                    callbackHost  : "ifood-print-auth-result"
+            ]
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+
+    sourceSets {
+        quickpay {
+            jniLibs.srcDirs = ['src/quickpay/jniLibs', 'libs/quickpay/jniLibs']
+        }
+        stone {
+            java.srcDirs = ['src/stone/java']
+        }
+        cielo {
+            java.srcDirs = ['src/cielo/java']
+        }
+        pagseguro {
+            java.srcDirs = ['src/pagseguro/java']
+        }
+        getnet {
+            java.srcDirs = ['src/getnet/java']
+        }
+        celular {
+            java.srcDirs = ['src/celular/java']
+        }
+        // stone { jniLibs.srcDirs = ['src/stone/jniLibs'] }
+        // pagseguro { jniLibs.srcDirs = ['src/pagseguro/jniLibs'] }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.config // Getnet obriga
+        }
+        debug {
+            jniDebuggable true
+            debuggable true
+            signingConfig signingConfigs.config // Getnet obriga
+        }
+    }
+}
+
+androidComponents {
+    // aplica SOMENTE nas variantes com flavorDimension "default" e valor "quickpay"
+    onVariants(selector().withFlavor("default", "quickpay")) { variant ->
+        // 🔴 REMOVIDO: variant.packaging.jniLibs.useLegacyPackaging = true  (read-only)
+
+        // ✅ pode configurar resources por-variant:
+        variant.packaging.resources.pickFirsts.addAll([
+                'lib/**/libDeviceConfig.so',
+                'lib/**/libPPCompAndroid.so',
+                'lib/**/libDCL.so',
+                'lib/**/libIGLBarDecoder.so',
+                'lib/**/libZBarDecoder.so',
+                'lib/**/libiconv.so',
+                'lib/**/libF_AE_LIB_PayDroid.so',
+                'lib/**/libF_DEVICE_LIB_PayDroid.so',
+                'lib/**/libF_DPAS_LIB_PayDroid.so',
+                'lib/**/libF_EMV_LIB_PayDroid.so',
+                'lib/**/libF_ENTRY_LIB_PayDroid.so',
+                'lib/**/libF_MC_LIB_PayDroid.so',
+                'lib/**/libF_PUBLIC_LIB_PayDroid.so',
+                'lib/**/libF_QPBOC_LIB_PayDroid.so',
+                'lib/**/libF_WAVE_LIB_PayDroid.so',
+        ])
+
+        variant.packaging.resources.excludes.addAll([
+                'META-INF/DEPENDENCIES',
+                'META-INF/LICENSE',
+                'META-INF/LICENSE.txt',
+                'META-INF/NOTICE',
+                'META-INF/NOTICE.txt',
+                'META-INF/*.SF',
+                'META-INF/*.DSA',
+                'META-INF/*.RSA',
+        ])
+    }
+}
+
+
+dependencies {
+    // Específico por flavor
+    celularImplementation 'com.google.android.play:app-update:2.1.0'
+
+    // Getnet – seus AAR/APK locais
+    getnetImplementation fileTree(
+            dir: 'libs',
+            include: ['serviceposdigital-2.2.6-35-release.apk,libposdigital-1.8.1-13-release.aar']
+    )
+
+    // Quickpay (Zoop)
+    quickpayImplementation "br.zoop.pos.plugin:smartpos-pax-a910:1.12.1"
+
+    // Getnet – rede/retrofit
+    getnetImplementation 'com.squareup.retrofit2:retrofit:3.0.0'
+    getnetImplementation 'com.squareup.retrofit2:converter-gson:3.0.0'
+    getnetImplementation 'com.squareup.okhttp3:logging-interceptor:5.2.1'
+    getnetImplementation 'com.squareup.retrofit2:adapter-rxjava2:3.0.0'
+
+    // PagSeguro (PlugPag wrapper)
+    pagseguroImplementation 'br.com.uol.pagseguro.plugpagservice.wrapper:wrapper:1.30.51'
+
+    // ====== Comuns ======
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'com.android.support.constraint:constraint-layout:2.0.4'
+    implementation 'androidx.recyclerview:recyclerview:1.4.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'javax.annotation:javax.annotation-api:1.3.2'
+    implementation 'com.google.android.material:material:1.13.0'
+    implementation 'com.android.support:design:28.0.0'
+    implementation 'androidx.activity:activity-ktx:1.10.1'
+
+    implementation 'com.squareup.retrofit2:retrofit:3.0.0'
+    implementation 'com.squareup.retrofit2:converter-gson:3.0.0'
+    implementation 'com.squareup.okhttp3:okhttp:5.2.1'
+    implementation 'com.squareup.okhttp3:logging-interceptor:5.1.0'
+
+    implementation 'androidx.test.ext:junit:1.3.0'
+    implementation 'androidx.lifecycle:lifecycle-process:2.9.4'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
+    implementation 'com.google.code.gson:gson:2.13.1'
+
+    implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
+    implementation 'com.google.zxing:core:3.5.3'
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
+
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.9.3"
+    implementation "androidx.lifecycle:lifecycle-extensions:2.2.0"
+    implementation "com.airbnb.android:lottie:6.6.10"
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:2.2.0"
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.21'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+    implementation "org.jetbrains.kotlin:kotlin-reflect:2.1.20"
+
+    implementation 'io.github.shashank02051997:FancyToast:2.0.2'
+
+    // Room Database
+    def room_version = "2.6.1"
+    implementation "androidx.room:room-runtime:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+    implementation "androidx.room:room-ktx:$room_version"
+    implementation 'androidx.localbroadcastmanager:localbroadcastmanager:1.1.0'
+}

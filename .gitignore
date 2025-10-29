@@ -1,0 +1,104 @@
+# Diretórios e arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+.idea/
+
+# Build e artefatos gerados
+.gradle/
+build/
+app/build/
+*.iml
+
+# Arquivos de configuração de sistema e IDE
+.idea/
+*.iml
+*.hprof
+local.properties
+*.bak
+*.log
+
+# Arquivos do Android Studio
+.idea/workspace.xml
+.idea/libraries/
+.idea/modules.xml
+.idea/codeStyles/
+.idea/assetWizardSettings.xml
+.idea/caches/
+.idea/inspectionProfiles/
+.idea/misc.xml
+
+# Arquivos de cache
+.gradle/
+captures/
+.externalNativeBuild/
+
+# Arquivos específicos do Android
+local.properties
+.navigation/
+*.keystore
+*.jks
+
+# Dependências
+*.jar
+*.war
+*.ear
+
+# Arquivos de configurações do sistema operacional
+*.swp
+*~
+*.swo
+*.DS_Store
+
+# Arquivos de testes locais
+test-results/
+test-output/
+reports/
+
+# Arquivos do IntelliJ IDEA
+.idea/
+*.iml
+out/
+
+# Arquivos de log do Android Studio
+*.log
+
+# Arquivos gerados do NDK
+obj/
+.libs/
+*.ndk
+
+# Firebase
+google-services.json
+google-services.plist
+crashlytics.properties
+fabric.properties
+
+# Arquivos de tradução
+*/build/outputs/apk/
+*/build/outputs/bundle/
+*/build/intermediates/
+*/build/generated/
+
+# Caches do Gradle
+**/caches/**
+
+# Outros arquivos indesejados
+*.class
+*.apk
+*.dex
+*.exe
+*.dll
+*.zip
+*.tar
+*.7z
+*.gz
+*.gzip
+*.class
+*.swp
+*.temp
+*.tmp
+
+# Arquivos de segurança
+secrets.properties
+*.keystore
+*.jks

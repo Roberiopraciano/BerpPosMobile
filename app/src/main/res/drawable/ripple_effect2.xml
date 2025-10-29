@@ -1,0 +1,4 @@
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/yello"> <!-- Cor do ripple (laranja) -->
+    <item android:drawable="@color/orang" /> <!-- Cor de fundo ao pressionar -->
+</ripple>

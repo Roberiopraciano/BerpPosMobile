@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@color/cardview_dark_background">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center_vertical">
+
+        <!-- Espaçador flexível -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- Título -->
+        <TextView
+            android:id="@+id/tvPinTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Digite sua Senha"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:gravity="center"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Ícone de segurança -->
+        <ImageView
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:layout_gravity="center"
+            android:src="@android:drawable/ic_lock_idle_lock"
+            android:layout_marginBottom="16dp"
+            android:tint="@color/orang" />
+
+        <!-- Display do PIN (asteriscos) -->
+        <TextView
+            android:id="@+id/tvPinDisplay"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@color/darkblue2"
+            android:gravity="center"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="@color/orang"
+            android:fontFamily="monospace"
+            android:layout_marginBottom="16dp"
+            android:padding="16dp" />
+
+        <!-- Instruções -->
+        <TextView
+            android:id="@+id/tvPinInstructions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Digite sua senha no terminal POS"
+            android:textSize="14sp"
+            android:textColor="@android:color/white"
+            android:gravity="center"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Informação adicional -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="• Use as teclas do terminal para digitar\n• Pressione ENTER para confirmar\n• Use CLEAR para apagar"
+            android:textSize="12sp"
+            android:textColor="@color/gray"
+            android:layout_marginBottom="24dp"
+            android:lineSpacingExtra="4dp" />
+
+        <!-- Botões -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/btnCancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Cancelar"
+                android:textSize="12sp"
+                android:background="@color/yello"
+                android:textColor="@android:color/white"
+                android:layout_marginEnd="8dp"
+                android:minWidth="120dp" />
+
+        </LinearLayout>
+
+        <!-- Indicador de progresso (opcional) -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="4dp"
+            android:layout_marginTop="16dp"
+            android:indeterminate="true"
+            android:visibility="gone"
+            android:progressTint="@color/orang" />
+
+        <!-- Espaçador flexível -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+    </LinearLayout>
+
+</ScrollView>

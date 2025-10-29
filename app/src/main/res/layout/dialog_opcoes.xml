@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@color/purpleback">
+
+    <!-- Card para Atendimento em Mesa -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardMesa"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        app:cardCornerRadius="8dp"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:clickable="true"
+
+        app:cardElevation="4dp">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="16dp"
+            android:background="@color/darkblue"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/imgMesa"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/ic_mesa64"
+                android:contentDescription="@string/mesas" />
+
+            <TextView
+                android:id="@+id/textMesa"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/mesas"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/zxing_status_text" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Card para Atendimento com Cartão -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardCartao"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+
+        android:foreground="?android:attr/selectableItemBackground"
+        android:clickable="true"
+
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@color/darkblue"
+            android:padding="16dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/imgCartao"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/cartao64"
+                android:contentDescription="@string/cartao" />
+
+            <TextView
+                android:id="@+id/textCartao"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/cartao"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/zxing_status_text" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <!-- Card para Atendimento no Balcão -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardBalcao"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_marginBottom="16dp"
+        android:foreground="?android:attr/selectableItemBackground"
+        android:clickable="true"
+
+        app:cardCornerRadius="8dp"
+        app:cardElevation="4dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@color/darkblue"
+            android:padding="16dp"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/imgBalcao"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:src="@drawable/balcao64"
+                android:contentDescription="@string/balcao" />
+
+            <TextView
+                android:id="@+id/textBalcao"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:text="@string/balcao"
+                android:textSize="18sp"
+
+                android:textStyle="bold"
+                android:textColor="@color/zxing_status_text" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+</LinearLayout>

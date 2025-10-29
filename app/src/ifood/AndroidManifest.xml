@@ -1,0 +1,55 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <uses-permission
+        android:name="android.permission.REORDER_TASKS"
+        tools:node="remove" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <application android:requestLegacyExternalStorage="true">
+
+        <meta-data
+            android:name="cs_integration_type"
+            android:value="uri" />
+
+        <!-- Activity para receber callbacks de pagamento iFood -->
+        <activity android:name="br.com.berpsistemas.BerpPOSMobile.PaymentCallbackActivity"
+            android:exported="true"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Configuração para iFood Payment Callback -->
+                <data android:scheme="berppos" android:host="payment-result" />
+            </intent-filter>
+        </activity>
+
+
+
+
+        <!-- Activity para receber callbacks de impressão Stone -->
+        <activity android:name="com.mobile.berp.BerpPOSMobile.PrintCallbackActivity"
+            android:exported="true"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="berppos" android:host="ifood-print-auth-result" />
+            </intent-filter>
+        </activity>
+
+    </application>
+
+</manifest>

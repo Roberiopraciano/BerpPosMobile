@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="6dp">
+
+
+    <TextView
+        android:id="@+id/tvCod"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:text="777777" />
+
+    <TextView
+        android:id="@+id/tvDesc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="100dp"
+        android:text="Rapadura raspada"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvQTD"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/tvCod"
+        android:layout_below="@+id/tvCod"
+        android:text="2,000" />
+
+    <TextView
+        android:id="@+id/tvValUnit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/tvDesc"
+        android:layout_alignParentStart="false"
+        android:layout_alignParentTop="false"
+        android:layout_below="@+id/tvDesc"
+        android:text="1.958,00" />
+
+    <TextView
+        android:id="@+id/tvAtend"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/tvQTD"
+        android:text="Roberio" />
+
+    <TextView
+        android:id="@+id/tvVLRTOT"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/tvValUnit"
+        android:layout_alignParentStart="false"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:text="3.916,00"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tvHora"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/tvAtend"
+        android:layout_alignParentEnd="true"
+        android:layout_below="@+id/tvVLRTOT"
+        android:text="13:45" />
+
+</RelativeLayout>

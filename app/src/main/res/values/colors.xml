@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorAccent">#D81B60</color>
+
+    <color name="backgroundcolor">#fcfcfc</color>
+    <color name="lightgray">#ededed</color>
+    <color name="deeppurple">#7c4dff</color>
+    <color name="yello">#FFB300</color>
+
+    <color name="green">#00bfa5</color>
+    <color name="darkblue">#082B47</color>
+    <color name="darkblue2">#23283A</color>
+    <color name="darkblu2">#031326</color>
+    <color name="purpleback">#849AE8</color>
+    <color name="azulberp">#2A95BF</color>
+    <color name="testcolorblue">#152b38</color>
+    <color name="corestranha">#8C793F</color>
+    <color name="pink">#fe104d</color>
+    <color name="gray">#808080</color>
+    <color name="black_overlay">#66000000</color>
+    <color name="comanda">#fdf5e6</color>
+    <color name="orang">#F29829</color>
+    <color name="orang2">#FFC06F</color>
+    <color name="TextButtonColor">#4E342E</color>
+    <color name="status_aberta">#23283A</color>
+    <color name="status_aguardando">#57231F</color>
+    <color name="status_fechada">#009688</color>
+    <color name="status_default">#23283A</color>
+    <color name="blue">#439DEC</color>
+</resources>

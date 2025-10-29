@@ -1,0 +1,68 @@
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.12.3'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:2.2.0"
+    }
+    ext.kotlin_version = '2.2.0'
+}
+
+ext {
+    // AGP 8.11 roda bem com JDK 17–21; mantenho 21 como você usava
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = sourceCompatibility
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+
+        // ========== STONE → só consulta esses repos quando o group “stone” for solicitado ==========
+        exclusiveContent {
+            forRepository { maven { url "https://packagecloud.io/stone/sdk-android/maven2" } }
+            filter {
+                includeGroupByRegex "br\\.com\\.stone(\\..*)?"
+                includeGroupByRegex "io\\.stone(\\..*)?"
+                includeGroupByRegex "com\\.stone(\\..*)?"
+            }
+        }
+        exclusiveContent {
+            forRepository { maven { url "https://packagecloud.io/stone/sdk-android-snapshot/maven2" } }
+            filter {
+                includeGroupByRegex "br\\.com\\.stone(\\..*)?"
+                includeGroupByRegex "io\\.stone(\\..*)?"
+                includeGroupByRegex "com\\.stone(\\..*)?"
+            }
+        }
+
+        // ========== PAGSEGURO (PlugPag wrapper) → só quando o group abaixo for solicitado ==========
+        exclusiveContent {
+            forRepository { maven { url 'https://github.com/pagseguro/PlugPagServiceWrapper/raw/master' } }
+            filter {
+                // group do seu artifact atual:
+                includeGroup "br.com.uol.pagseguro.plugpagservice.wrapper"
+            }
+        }
+
+        // ========== ZOOP (Quickpay) → só quando “br.zoop.pos.plugin” for solicitado ==========
+        exclusiveContent {
+            forRepository {
+                maven {
+                    url = uri("https://maven.pkg.github.com/getzoop/zoop-package-public")
+                    credentials {
+                        // Use gradle.properties (gpr.user/gpr.key) ou env vars
+                        username = findProperty("gpr.user") ?: System.getenv("GITHUB_USER")
+                        password = findProperty("gpr.key")  ?: System.getenv("GITHUB_TOKEN")
+                    }
+                }
+            }
+            filter { includeGroup "br.zoop.pos.plugin" }
+        }
+    }
+}
+
+task clean(type: Delete) { delete rootProject.buildDir }

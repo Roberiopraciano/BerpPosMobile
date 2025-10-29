@@ -1,0 +1,10 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="com.pax.permission.PRINTER" />
+    <uses-permission android:name="com.pax.permission.PICC" />
+    <uses-permission android:name="com.pax.permission.PINPAD" />
+    <uses-permission android:name="com.pax.permission.MAG" />
+    <uses-permission android:name="com.pax.permission.SCANNER" />
+
+
+</manifest>

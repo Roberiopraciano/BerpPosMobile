@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="#1E1E1E">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Header com ID e Status -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tvTransactionId"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="ID: TXN_123456"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:textColor="#E0E0E0" />
+
+            <TextView
+                android:id="@+id/tvStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="APROVADO"
+                android:textStyle="bold"
+                android:textSize="12sp"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#2E7D32"
+                android:background="@drawable/status_background"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp" />
+
+        </LinearLayout>
+
+        <!-- Linha com Valor e Acquirer -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tvAmount"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="R$ 150,00"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:textColor="#4CAF50" />
+
+            <TextView
+                android:id="@+id/tvAcquirer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="STONE"
+                android:textStyle="bold"
+                android:textSize="12sp"
+                android:textColor="#FFFFFF"
+                android:backgroundTint="#455A64"
+                android:background="@drawable/acquirer_background"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp" />
+
+        </LinearLayout>
+
+        <!-- Informações do Cartão -->
+        <TextView
+            android:id="@+id/tvCardInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="VISA • **** **** **** 1234"
+            android:textSize="14sp"
+            android:textColor="#B0B0B0" />
+
+        <!-- Linha com Tipo e Data -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:id="@+id/tvTransactionType"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Crédito"
+                android:textSize="12sp"
+                android:textColor="#B0B0B0" />
+
+            <TextView
+                android:id="@+id/tvDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="10/09/2025 14:30"
+                android:textSize="12sp"
+                android:textColor="#B0B0B0" />
+
+        </LinearLayout>
+
+        <!-- Divisor -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginVertical="12dp"
+            android:background="#33FFFFFF" />
+
+        <!-- Botões de Ação -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <!-- Botões de Reimpressão -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:orientation="vertical">
+
+                <Button
+                    android:id="@+id/btnReprintCustomer"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:text="Via Cliente"
+                    android:textSize="12sp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_marginBottom="6dp"
+                    android:backgroundTint="#424242"
+                    android:textColor="#FFFFFF"
+                    style="@style/Widget.MaterialComponents.Button" />
+
+                <Button
+                    android:id="@+id/btnReprintEstablishment"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:text="Via Estabelecimento"
+                    android:textSize="12sp"
+                    android:layout_marginEnd="4dp"
+                    android:backgroundTint="#424242"
+                    android:textColor="#FFFFFF"
+                    style="@style/Widget.MaterialComponents.Button" />
+
+
+            </LinearLayout>
+
+            <!-- Botões de Ação -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <Button
+                    android:id="@+id/btnCancel"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:text="Cancelar"
+                    android:textSize="12sp"
+                    android:layout_marginStart="4dp"
+                    android:layout_marginBottom="6dp"
+                    android:backgroundTint="#E53935"
+                    android:textColor="#FFFFFF"
+                    style="@style/Widget.MaterialComponents.Button" />
+
+                <!-- Botão Detalhes (cinza sólido) -->
+                <Button
+                    android:id="@+id/btnDetails"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:text="Detalhes"
+                    android:textSize="12sp"
+                    android:layout_marginStart="4dp"
+                    android:backgroundTint="#424242"
+                    android:textColor="#FFFFFF"
+                    style="@style/Widget.MaterialComponents.Button" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
