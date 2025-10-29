@@ -16,6 +16,7 @@ app/build/
 local.properties
 *.bak
 *.log
+.env
 
 # Arquivos do Android Studio
 .idea/workspace.xml
