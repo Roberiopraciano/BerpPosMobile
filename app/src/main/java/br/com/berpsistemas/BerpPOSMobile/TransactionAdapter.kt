@@ -167,9 +167,9 @@ class TransactionAdapter(
 
     private fun setupActionButtons(holder: TransactionViewHolder, transaction: TransactionModel) {
         // Botões de reimpressão - habilitados para transações aprovadas não canceladas
-        val canReprint = transaction.isApproved() && !transaction.isCancelled
+        val canReprint = true;// transaction.isApproved() && !transaction.isCancelled
 
-        holder.btnReprintCustomer.isEnabled = canReprint
+       holder.btnReprintCustomer.isEnabled = canReprint
         holder.btnReprintEstablishment.isEnabled = canReprint
 
         if (canReprint) {

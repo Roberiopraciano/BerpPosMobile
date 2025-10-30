@@ -25,7 +25,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="220dp"
-            android:text="2.3.32" />
+            android:text="2.3.33" />
         <TextView
             android:id="@+id/txtFlavor"
             android:layout_width="wrap_content"

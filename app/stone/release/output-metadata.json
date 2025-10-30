@@ -4,15 +4,15 @@
     "type": "APK",
     "kind": "Directory"
   },
-  "applicationId": "com.mobile.berp.BerpPosMobile.stone",
+  "applicationId": "br.com.berpsistemas.BerpPOSMobile.stone",
   "variantName": "stoneRelease",
   "elements": [
     {
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 45,
-      "versionName": "2.3.31",
+      "versionCode": 47,
+      "versionName": "2.3.33",
       "outputFile": "app-stone-release.apk"
     }
   ],
@@ -33,5 +33,5 @@
       ]
     }
   ],
-  "minSdkVersionForDexing": 24
+  "minSdkVersionForDexing": 22
 }

@@ -418,21 +418,31 @@ class TransactionListActivity : AppCompatActivity() {
         }
     }
 
+    // TransactionListActivity.kt
+
     private fun handleCancelCallback(uri: Uri?) {
         try {
             val success = uri?.getQueryParameter("success") == "true"
             val transactionId = uri?.getQueryParameter("transaction_id")
             val cancellationId = uri?.getQueryParameter("cancellation_id")
+            val authCode = uri?.getQueryParameter("authcode") ?: uri?.getQueryParameter("authorization_code")
 
             if (success && transactionId != null) {
-                // Marcar como cancelado no banco
+                // 1. Marcar como cancelado no banco LOCAL
                 val cancelId = cancellationId ?: "CANCEL_${System.currentTimeMillis()}"
-                databaseHelper.cancelTransaction(transactionId, cancelId)
+                val localSuccess = databaseHelper.cancelTransaction(transactionId, cancelId, "Cancelado via App")
 
-                loadTransactions() // Recarregar lista
-                updateStats() // Atualizar estatísticas
+                if (localSuccess) {
+                    // 2. ENVIAR PARA O BACKEND (NOVO)
+                    syncCancellationWithBackend(transactionId, authCode ?: cancelId)
 
-                Toast.makeText(this, "Transação cancelada com sucesso!", Toast.LENGTH_SHORT).show()
+                    loadTransactions() // Recarregar lista
+                    updateStats() // Atualizar estatísticas
+
+                    Toast.makeText(this, "Transação cancelada com sucesso!", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, "Erro ao cancelar localmente", Toast.LENGTH_SHORT).show()
+                }
             } else {
                 val error = uri?.getQueryParameter("error") ?: "Erro desconhecido"
                 Toast.makeText(this, "Erro no cancelamento: $error", Toast.LENGTH_LONG).show()
@@ -441,5 +451,99 @@ class TransactionListActivity : AppCompatActivity() {
             Log.e(TAG, "Erro ao processar callback de cancelamento", e)
             Toast.makeText(this, "Erro ao processar retorno do cancelamento", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    // NOVO: Sincronizar cancelamento com o backend
+    private fun syncCancellationWithBackend(transactionId: String, authCode: String) {
+        // Mostrar feedback ao usuário
+        uiManager.showSDKMessage("Sincronizando cancelamento com servidor...", "PROCESSING", true)
+
+        // Buscar a transação local para obter todos os dados
+        val transaction = databaseHelper.getTransactionByAnyId(transactionId)
+
+        if (transaction == null) {
+            Log.e(TAG, "Transação não encontrada para sincronização: $transactionId")
+            uiManager.showSDKMessage("Erro: Transação não encontrada", "ERROR", false)
+            return
+        }
+
+        // Executar em background
+        Thread {
+            try {
+                // Gerar controle de duplicidade
+                val controle = br.com.berpsistemas.BerpPOSMobile.model.BerpModel.ControleDuplicidade()
+
+                // Chamar Proxy.deletePagamento
+                val backendSuccess = br.com.berpsistemas.BerpPOSMobile.Controller.Proxy
+                    .deletePagamento(transaction.nsu, transaction.orderId,transaction.authorizationCode,controle)
+                    .get(15, java.util.concurrent.TimeUnit.SECONDS)
+
+                runOnUiThread {
+                    if (backendSuccess) {
+                        Log.d(TAG, "Cancelamento sincronizado com sucesso no backend")
+                        uiManager.showSDKMessage("Cancelamento sincronizado com servidor ✓", "SUCCESS", false)
+
+                        // Marcar no banco local que foi sincronizado
+                        markTransactionAsSynced(transactionId)
+
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            uiManager.dismissAll()
+                        }, 2000)
+                    } else {
+                        Log.w(TAG, "Backend retornou false para cancelamento")
+                        uiManager.showSDKMessage("Aviso: Cancelamento não confirmado pelo servidor", "WARNING", false)
+
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            uiManager.dismissAll()
+                        }, 3000)
+                    }
+                }
+
+            } catch (e: java.util.concurrent.TimeoutException) {
+                Log.e(TAG, "Timeout ao sincronizar cancelamento com backend", e)
+                runOnUiThread {
+                    uiManager.showSDKMessage("Timeout ao conectar com servidor", "ERROR", false)
+                    showRetryDialog(transactionId, authCode)
+                }
+
+            } catch (e: Exception) {
+                Log.e(TAG, "Erro ao sincronizar cancelamento com backend", e)
+                runOnUiThread {
+                    uiManager.showSDKMessage("Erro ao sincronizar: ${e.message}", "ERROR", false)
+                    showRetryDialog(transactionId, authCode)
+                }
+            }
+        }.start()
+    }
+
+    // NOVO: Marcar transação como sincronizada
+    private fun markTransactionAsSynced(transactionId: String) {
+        try {
+            // Você pode adicionar um campo 'synced' no TransactionModel se necessário
+            Log.d(TAG, "Transação marcada como sincronizada: $transactionId")
+        } catch (e: Exception) {
+            Log.e(TAG, "Erro ao marcar transação como sincronizada", e)
+        }
+    }
+
+    // NOVO: Mostrar diálogo para retry em caso de erro
+    private fun showRetryDialog(transactionId: String, authCode: String) {
+        AlertDialog.Builder(this)
+            .setTitle("Erro de Sincronização")
+            .setMessage("""
+            O cancelamento foi processado localmente, mas não foi possível 
+            sincronizar com o servidor.
+            
+            Deseja tentar novamente?
+        """.trimIndent())
+            .setPositiveButton("Tentar Novamente") { _, _ ->
+                syncCancellationWithBackend(transactionId, authCode)
+            }
+            .setNegativeButton("Ignorar") { dialog, _ ->
+                dialog.dismiss()
+                uiManager.dismissAll()
+            }
+            .setCancelable(false)
+            .show()
     }
 }

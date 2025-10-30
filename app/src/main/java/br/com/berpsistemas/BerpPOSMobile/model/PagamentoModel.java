@@ -59,6 +59,10 @@ public class PagamentoModel {
     @SerializedName("NSU_TEF")
     private String nsuTef;
 
+
+    @SerializedName("DOC")
+    private String doc;
+
     @SerializedName("NSU_HOST")
     private String nsuHost;
 
@@ -224,6 +228,10 @@ public class PagamentoModel {
     public int getPgpCdfpag() { return pgpCdfpag; }
     public void setPgpCdfpag(int pgpCdfpag) { this.pgpCdfpag = pgpCdfpag; }
 
+
+    public String getdoc() { return doc; }
+    public void setdoc(String doc) { this.doc = doc; }
+
     public double getPgpVlrpag() { return pgpVlrpag; }
     public void setPgpVlrpag(double pgpVlrpag) { this.pgpVlrpag = pgpVlrpag; }
 
@@ -252,7 +260,7 @@ public class PagamentoModel {
     public void setNsuHost(String nsuHost) { this.nsuHost = nsuHost; }
 
     public String getAutorizacao() { return autorizacao; }
-    public void setAutorizacao(String autorizacao) { this.autorizacao = autorizacao; }
+    public void setAutorizacao(String autorizacao) { this.autorizacao = autorizacao; this.doc=autorizacao; }
 
     public String getBandeira() { return bandeira; }
     public void setBandeira(String bandeira) { this.bandeira = bandeira; }
@@ -330,7 +338,7 @@ public class PagamentoModel {
     public void setOrigempagamento(String origempagamento) { this.origempagamento = origempagamento; }
 
     public String getNsu() { return nsu; }
-    public void setNsu(String nsu) { this.nsu = nsu; }
+    public void setNsu(String nsu) { this.nsu = nsu;  this.nsuTef = nsu; }
 
     public String getRede() { return rede; }
     public void setRede(String rede) { this.rede = rede; }

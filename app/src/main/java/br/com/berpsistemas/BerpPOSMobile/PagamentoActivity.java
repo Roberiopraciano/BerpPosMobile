@@ -27,6 +27,9 @@ import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
 import br.com.berpsistemas.BerpPOSMobile.application.MyBerpApplication;
 import br.com.berpsistemas.BerpPOSMobile.database.TransactionDatabaseHelperV2;
 import br.com.berpsistemas.BerpPOSMobile.model.TransactionModel;
@@ -364,41 +367,57 @@ public class PagamentoActivity extends AppCompatActivity implements View.OnClick
     private void finalizarPagamento() {
         btnFinalizePag.setEnabled(false);
 
-        finishOrder(Integer.parseInt(BerpModel.getId()))
-                .thenAccept(success -> {
-                    runOnUiThread(() -> {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(PagamentoActivity.this)
-                                .setCancelable(false)
-                                .setPositiveButton("OK", (dialog, which) -> {
-                                    dialog.dismiss();
-                                    finish();
-                                });
+        new AsyncTask<Void, Void, Boolean>() {
+            private Exception error;
 
-                        if (success) {
-                            builder.setTitle("Sucesso")
-                                    .setMessage("Conta finalizada com sucesso!");
-                        } else {
-                            builder.setTitle("Falha")
-                                    .setMessage("Não foi possível finalizar a conta. Tente novamente mais tarde.");
-                        }
+            @Override
+            protected Boolean doInBackground(Void... voids) {
+                try {
+                    // Se finishOrder retorna CompletableFuture<Boolean>,
+                    // usamos get com timeout (compatível com API 22).
+                    return finishOrder(Integer.parseInt(BerpModel.getId()))
+                            .get(12, java.util.concurrent.TimeUnit.SECONDS);
+                } catch (java.util.concurrent.TimeoutException te) {
+                    error = new Exception("Timeout ao finalizar a conta");
+                    return false;
+                } catch (Exception e) {
+                    error = e;
+                    return false;
+                }
+            }
 
-                        builder.show();
-                    });
-                })
-                .exceptionally(ex -> {
-                    runOnUiThread(() -> {
-                        new AlertDialog.Builder(PagamentoActivity.this)
-                                .setTitle("Erro")
-                                .setMessage("Ocorreu um erro ao finalizar a conta:\n" + ex.getMessage())
-                                .setCancelable(false)
-                                .setPositiveButton("OK", (dialog, which) -> {
-                                    dialog.dismiss();
-                                })
-                                .show();
-                    });
-                    return null;
-                });
+            @Override
+            protected void onPostExecute(Boolean success) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(PagamentoActivity.this)
+                        .setCancelable(false)
+                        .setPositiveButton("OK", (dialog, which) -> {
+                            dialog.dismiss();
+                            if (success) {
+                                // No sucesso, mantém o comportamento original: fecha a tela
+                                finish();
+                            } else {
+                                // Em falha/erro, reabilita o botão para o operador tentar de novo
+                                btnFinalizePag.setEnabled(true);
+                            }
+                        });
+
+                if (error != null) {
+                    builder.setTitle("Erro")
+                            .setMessage("Ocorreu um erro ao finalizar a conta:\n" + error.getMessage())
+                            .show();
+                } else if (success) {
+                    builder.setTitle("Sucesso")
+                            .setMessage("Conta finalizada com sucesso!")
+                            .show();
+                } else {
+                    builder.setTitle("Falha")
+                            .setMessage("Não foi possível finalizar a conta. Tente novamente mais tarde.")
+                            .show();
+                }
+            }
+        }.execute();
     }
+
 
     @Override
     public void onPaymentMethodSelected(String method) {
@@ -625,16 +644,29 @@ public class PagamentoActivity extends AppCompatActivity implements View.OnClick
         protected Integer doInBackground(String... values) {
             try {
                 if (BerpModel.verificaPagamentos(BerpModel.getNumMesa())) {
-                    mesa = Proxy.visualizaConta(BerpModel.getId(), 0).get();
-                    return 0;
+                    try {
+                        // Timeout compatível com API 22
+                        mesa = Proxy.visualizaConta(BerpModel.getId(), 0)
+                                .get(12, java.util.concurrent.TimeUnit.SECONDS);
+                    } catch (java.util.concurrent.TimeoutException te) {
+                        exceptMsg = "Timeout ao consultar a conta";
+                        return 98; // erro transitório
+                    }
+                    return 0; // OK
                 } else {
-                    return 1;
+                    return 1; // sem pagamentos
                 }
             } catch (Exception e) {
                 e.printStackTrace();
                 exceptMsg = e.getMessage();
-                Log.e(TAG, "Erro ao conectar com servidor: " + e.getMessage());
-                return 99;
+                String msg = (exceptMsg == null ? "" : exceptMsg).toLowerCase();
+                if (msg.contains("internal server error") || msg.contains("500")
+                        || msg.contains("timeout") || msg.contains("failed to connect")
+                        || msg.contains("unable to resolve host")
+                        || msg.contains("transa")) { // “transação manual/distribuída”
+                    return 98; // transitório
+                }
+                return 99; // fatal (não mapeado)
             }
         }
 
@@ -648,37 +680,37 @@ public class PagamentoActivity extends AppCompatActivity implements View.OnClick
         @Override
         protected void onPostExecute(Integer result) {
             if (dialog != null && dialog.isShowing()) {
-                try {
-                    dialog.dismiss();
-                } catch (Exception e) {
+                try { dialog.dismiss(); } catch (Exception e) {
                     Log.e(TAG, "Erro ao fechar diálogo: " + e.getMessage());
                 }
             }
 
             if (result == 1) {
+                // Fluxo original quando não há pagamentos
                 BerpModel.setSelectedCMD("3");
                 finish();
                 Intent i = new Intent(context, NMesaActivity.class);
                 context.startActivity(i);
-            } else if (result == 0) {
+                return;
+            }
+
+            if (result == 0) {
+                // SUCESSO: popular a UI com os valores da mesa
                 String vlrLiquido = mesa.getVlrLiquido();
                 String vlrServico = mesa.getVlrServico();
-                String vlrBruto = mesa.getVlrBruto();
+                String vlrBruto   = mesa.getVlrBruto();
 
                 txtvlrsubtotal.setText("Liquido :" + (isNullOrBlank(vlrLiquido) ? "R$0,00" : vlrLiquido));
                 txtvlrservico.setText("Servico :" + (isNullOrBlank(vlrServico) ? "R$0,00" : vlrServico));
                 txtfaltapagar.setText("Falta :" + (isNullOrBlank(vlrBruto) ? "R$0,00" : vlrBruto));
                 txtLabelAtendimento.setText(mesa.getVen_nmtpvend() + " " + mesa.getCdMesa());
                 txttotalLabel.setText("Total: " + mesa.getVlrBruto());
-                txtVlrPago.setText("Pago :"+mesa.getTotalPagoStr());
+                txtVlrPago.setText("Pago :"+ mesa.getTotalPagoStr());
 
                 if (!isNullOrBlank(vlrBruto)) {
                     try {
                         Log.d(TAG, "Valor bruto original: '" + vlrBruto + "'");
-
-                        String vlrPagam = vlrBruto.replaceAll("[^0-9,.]+", "");
-                        vlrPagam = vlrPagam.replace(",", ".");
-
+                        String vlrPagam = vlrBruto.replaceAll("[^0-9,.]+", "").replace(",", ".");
                         java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("(\\d+(\\.\\d+)?)");
                         java.util.regex.Matcher matcher = pattern.matcher(vlrPagam);
 
@@ -688,63 +720,110 @@ public class PagamentoActivity extends AppCompatActivity implements View.OnClick
                             Log.d(TAG, "Valor extraído após processamento: '" + match + "'");
                             vvlrpagar = Double.parseDouble(match);
                         }
-                        String valorApresentar=NumberFormat.getCurrencyInstance(myLocale).format(vvlrpagar);
+                        String valorApresentar = NumberFormat.getCurrencyInstance(myLocale).format(vvlrpagar);
                         edtxtVlrPaga.setText(valorApresentar);
                         edtxtVlrPaga.setSelection(0, Objects.requireNonNull(edtxtVlrPaga.getText()).length());
 
                         total_venda = vvlrpagar;
                     } catch (Exception e) {
                         Log.e(TAG, "Erro ao processar valor: " + e.getMessage() + " para entrada: '" + vlrBruto + "'");
-                        FancyToast.makeText(context, "Erro ao processar o valor de pagamento.", FancyToast.LENGTH_LONG,FancyToast.ERROR,true).show();
+                        FancyToast.makeText(context, "Erro ao processar o valor de pagamento.", FancyToast.LENGTH_LONG, FancyToast.ERROR, true).show();
                         edtxtVlrPaga.setText(NumberFormat.getCurrencyInstance(myLocale).format(0));
                     }
                 } else {
                     edtxtVlrPaga.setText(NumberFormat.getCurrencyInstance(myLocale).format(0));
                 }
                 edtxtVlrPaga.requestFocus();
-
                 getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+
+            } else if (result == 98) {
+                // ERRO TRANSITÓRIO: não fecha a Activity; mostra retry
+                new AlertDialog.Builder(context)
+                        .setTitle("Servidor ocupado")
+                        .setMessage((exceptMsg == null || exceptMsg.trim().isEmpty())
+                                ? "Não foi possível consultar a conta agora."
+                                : exceptMsg)
+                        .setCancelable(false)
+                        .setPositiveButton("Tentar novamente", (d, which) ->
+                                // pequeno backoff antes de re-tentar
+                                edtxtVlrPaga.postDelayed(() -> new ConnServer(context).execute("", "", ""), 1200)
+                        )
+                        .setNegativeButton("Voltar", null)
+                        .show();
+
             } else {
+                // 99 e outros: mantém comportamento original (volta para tela anterior)
                 String errorMsg = exceptMsg == null ? "Erro desconhecido." : exceptMsg;
-                FancyToast.makeText(context, errorMsg, FancyToast.LENGTH_LONG,FancyToast.CONFUSING,true).show();
+                FancyToast.makeText(context, errorMsg, FancyToast.LENGTH_LONG, FancyToast.CONFUSING, true).show();
                 Log.e(TAG, "Erro na conexão: " + errorMsg);
                 BerpModel.setSelectedCMD("3");
                 finish();
                 Intent i = new Intent(context, NMesaActivity.class);
                 context.startActivity(i);
+                return;
             }
 
-            Proxy.listarPagamentos(BerpModel.getId()).thenAccept(pags -> {
-                runOnUiThread(() -> {
-                    pagamentosList.clear();
-                    listpagamentos.clear();
-                    mesa.clearPagamentos();
+            // ===== Carregar lista de pagamentos (compatível com API 22) =====
+            new AsyncTask<Void, Void, List<PagamentoModel>>() {
+                private Exception error;
 
-                    for (PagamentoModel pag : pags) {
-                        pagamentosList.add(pag);
-                        mesa.addPagamento(pag);
-                        String metodoPagamento;
+                @Override
+                protected List<PagamentoModel> doInBackground(Void... voids) {
+                    try {
+                        // Se listarPagamentos retorna CompletableFuture<List<PagamentoModel>>,
+                        // usamos get com timeout (compatível):
+                        return Proxy.listarPagamentos(BerpModel.getId())
+                                .get(10, java.util.concurrent.TimeUnit.SECONDS);
+                    } catch (java.util.concurrent.TimeoutException te) {
+                        error = new Exception("Timeout ao consultar a lista de pagamentos");
+                        return null;
+                    } catch (Exception e) {
+                        error = e;
+                        return null;
+                    }
+                }
 
-                        if (Objects.equals(pag.getTipoCartaoDebCre(), "DEB")) {
-                            metodoPagamento = "Débito";
-                        } else if (Objects.equals(pag.getTipoCartaoDebCre(), "CRE")) {
-                            metodoPagamento = "Crédito";
-                        } else if (Objects.equals(pag.getTipoCartaoDebCre(), "PIX")) {
-                            metodoPagamento = "PIX";
-                        } else {
-                            metodoPagamento = "Pagamento";
-                        }
-
-                        String texto = NumberFormat.getCurrencyInstance(myLocale).format(pag.getPgpVlrpag()) + " " + metodoPagamento;
-                        listpagamentos.add(texto);
+                @Override
+                protected void onPostExecute(List<PagamentoModel> pags) {
+                    if (error != null || pags == null) {
+                        Log.w(TAG, "listarPagamentos falhou: " + (error == null ? "null" : error.getMessage()));
+                        FancyToast.makeText(
+                                PagamentoActivity.this,
+                                "Não foi possível atualizar a lista de pagamentos agora.",
+                                FancyToast.LENGTH_SHORT, FancyToast.INFO, true
+                        ).show();
+                        return;
                     }
 
-                    adapter.notifyDataSetChanged();
-                    atualizarValorFaltante();
-                });
-            });
+                    try {
+                        pagamentosList.clear();
+                        listpagamentos.clear();
+                        mesa.clearPagamentos();
+
+                        for (PagamentoModel pag : pags) {
+                            pagamentosList.add(pag);
+                            mesa.addPagamento(pag);
+
+                            final String metodo =
+                                    "DEB".equals(pag.getTipoCartaoDebCre()) ? "Débito" :
+                                            "CRE".equals(pag.getTipoCartaoDebCre()) ? "Crédito" :
+                                                    "PIX".equals(pag.getTipoCartaoDebCre()) ? "PIX" : "Pagamento";
+
+                            listpagamentos.add(
+                                    NumberFormat.getCurrencyInstance(myLocale).format(pag.getPgpVlrpag())
+                                            + " " + metodo
+                            );
+                        }
+                        adapter.notifyDataSetChanged();
+                        atualizarValorFaltante();
+                    } catch (Exception e) {
+                        Log.e(TAG, "Falha ao atualizar lista de pagamentos: " + e.getMessage());
+                    }
+                }
+            }.execute();
         }
     }
+
 
     private class ProcessoPagamento extends AsyncTask<String, String, String> {
         private Context context;
@@ -987,25 +1066,41 @@ public class PagamentoActivity extends AppCompatActivity implements View.OnClick
         });
     }
 
+
     @Override
     public void onRefundSuccess(PagamentoModel pagCancelado) {
-        TransactionModel transacaoOriginal = dbHelper.getTransactionByAnyId(pagCancelado.getNsu());
-        if (transacaoOriginal != null) {
-            dbHelper.cancelTransaction(transacaoOriginal.getId(), pagCancelado.getAutorizacao(), "Estorno via App");
-            Log.d(TAG, "Transação " + transacaoOriginal.getId() + " marcada como CANCELLED no DB via estorno.");
-        } else {
-            Log.w(TAG, "Não foi possível encontrar a transação original para o estorno com NSU: " + pagCancelado.getNsu());
-        }
+        // NÃO gravar no banco aqui - já foi feito no PaymentCallbackHandler!
 
         runOnUiThread(() -> {
+            // Apenas atualizar a UI
             for (int i = 0; i < pagamentosList.size(); i++) {
                 PagamentoModel p = pagamentosList.get(i);
-                if (p.getCvNumber().equals(pagCancelado.getCvNumber())) {
-                    pagamentosList.remove(i);
-                    listpagamentos.remove(i);
-                    adapter.notifyDataSetChanged();
-                    atualizarValorFaltante();
-                    FancyToast.makeText(this, "Reembolso concluído com sucesso", FancyToast.LENGTH_LONG,FancyToast.INFO,true).show();
+
+                // Buscar por qualquer identificador disponível
+                boolean isMatch = false;
+                if (pagCancelado.getCvNumber() != null &&
+                        p.getCvNumber() != null &&
+                        p.getCvNumber().equals(pagCancelado.getCvNumber())) {
+                    isMatch = true;
+                } else if (pagCancelado.getNsu() != null &&
+                        p.getNsu() != null &&
+                        p.getNsu().equals(pagCancelado.getNsu())) {
+                    isMatch = true;
+                } else if (pagCancelado.getTransactionId() != null &&
+                        p.getTransactionId() != null &&
+                        p.getTransactionId().equals(pagCancelado.getTransactionId())) {
+                    isMatch = true;
+                }
+
+                if (isMatch) {
+                    // Remover da lista de memória (BerpModel)
+
+
+                    FancyToast.makeText(this,
+                            "Reembolso concluído com sucesso",
+                            FancyToast.LENGTH_LONG,
+                            FancyToast.INFO,
+                            true).show();
                     break;
                 }
             }

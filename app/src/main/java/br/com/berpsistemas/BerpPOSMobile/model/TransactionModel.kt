@@ -335,7 +335,9 @@ data class TransactionModel(
         maskedPan: String,
         cardBin: String
     ): TransactionModel {
-        return copy(
+        return this.copy(
+            // ✅ MANTER O MESMO ID LOCAL!
+            id = this.id,  // NÃO mudar o ID
             transactionId = transactionId,
             nsu = nsu,
             platformId = platformId,
@@ -520,11 +522,13 @@ data class TransactionModel(
         fun createRefund(
             originalTransaction: TransactionModel,
             refundAmount: Double = originalTransaction.amount,
-            reason: String = "Estorno"
+            reason: String = "Estorno",
+            transactionId:String = "",
+            nsu:String = ""
         ): TransactionModel = TransactionModel(
             id = "REF_${System.currentTimeMillis()}",
-            transactionId = "REFUND_${originalTransaction.transactionId}",
-            nsu = "REF_${originalTransaction.nsu}",
+            transactionId = transactionId,
+            nsu = nsu,
             orderId = "REF_${originalTransaction.orderId}",
             platformId = "REF_${originalTransaction.platformId}",
             amount = refundAmount,

@@ -345,7 +345,11 @@ class EnhancedTransactionManagerV2
         originalTransactionId: String,
         refundAmount: Double,
         reason: String,
-        acquirer: String
+        acquirer: String,
+        transactionId: String,
+        nsu: String,
+        orderId: String,
+        platformId: String,
     ): Boolean {
         return try {
             val originalTransaction = findTransactionById(originalTransactionId)
@@ -357,7 +361,9 @@ class EnhancedTransactionManagerV2
             val refundTransaction = TransactionModel.createRefund(
                 originalTransaction = originalTransaction,
                 refundAmount = refundAmount,
-                reason = reason
+                reason = reason,
+                transactionId,
+                nsu
             )
 
             val result = saveTransaction(refundTransaction)

@@ -3,6 +3,7 @@ package br.com.berpsistemas.BerpPOSMobile.util
 import br.com.berpsistemas.BerpPOSMobile.model.PagamentoModel
 import br.com.berpsistemas.BerpPOSMobile.model.TransactionModel
 import android.util.Log
+import br.com.berpsistemas.BerpPOSMobile.model.Variaveis
 import com.google.gson.Gson
 import java.util.*
 
@@ -31,9 +32,9 @@ object TransactionConverter {
         return PagamentoModel().apply {
             // Campos universais mapeados
             bandeira = transaction.cardBrand
-            autorizacao = transaction.nsu  // NSU universal
+            autorizacao = transaction.transactionId  // NSU universal
             cartao = transaction.maskedPan
-
+            nsu  = transaction.nsu
             terminal = transaction.terminalId
             idOrder = transaction.orderId   // Order ID universal
             transactionId = transaction.transactionId
@@ -41,6 +42,8 @@ object TransactionConverter {
             binCartao = transaction.cardBin
             tipoCartaoDebCre = transaction.paymentTypeCode
             pgpVlrpag = transaction.amount
+            pgpCdusua = Variaveis.getUserId()
+
 
             // Campos específicos baseados no adquirente
             when (transaction.acquirer.uppercase()) {
@@ -116,12 +119,15 @@ object TransactionConverter {
 
         // Stone usa ITK como transaction_id e ATK como platform_id
         pagamentoModel.apply {
-            cvNumber = transaction.transactionId  // ITK
+            cvNumber = ""
+            transactionId = transaction.transactionId  // ITK
             idPlataforma = transaction.platformId  // ATK
             idOrder = transaction.orderId
             idMovvenda =transaction.orderId.toInt()
             nsu =transaction.nsu
-            autorizacao = transaction.authorizationCode          // authorization_code
+            autorizacao = transaction.transactionId
+            origemoperacao = "Mobile"
+            origempagamento ="Stone"// authorization_code
         }
 
         Log.d(TAG, "Campos Stone mapeados - ITK: ${transaction.transactionId}, ATK: ${transaction.platformId}")
@@ -138,7 +144,7 @@ object TransactionConverter {
             transactionId = transaction.transactionId
             idPlataforma = transaction.platformId  // cieloCode
             idOrder = transaction.orderId          // paymentId
-            autorizacao = transaction.nsu          // authCode
+            autorizacao = transaction.transactionId          // authCode
         }
 
         Log.d(TAG, "Campos Zoop mapeados - TransactionId: ${transaction.transactionId}, CieloCode: ${transaction.platformId}")

@@ -188,20 +188,35 @@ class TransactionDatabaseHelperV2(context: Context) : SQLiteOpenHelper(
         val db = writableDatabase
         return try {
             val values = transactionToContentValues(transaction)
+
+            // 1️⃣ Primeiro, tenta inserir (se não existe)
             val result = db.insertWithOnConflict(
                 TABLE_TRANSACTIONS,
                 null,
                 values,
-                SQLiteDatabase.CONFLICT_REPLACE
+                SQLiteDatabase.CONFLICT_IGNORE  // ✅ Ignora se já existe
             )
 
-            if (result > 0) {
-                Log.d(TAG, "Transação salva: ${transaction.id} (${transaction.acquirer})")
+            // 2️⃣ Se inserção falhou (já existe), atualiza
+            if (result == -1L) {
+                val updated = db.update(
+                    TABLE_TRANSACTIONS,
+                    values,
+                    "$COLUMN_ID = ?",
+                    arrayOf(transaction.id)
+                )
+
+                if (updated > 0) {
+                    Log.d(TAG, "Transação atualizada: ${transaction.id}")
+                    return updated.toLong()
+                }
+            } else {
+                Log.d(TAG, "Transação inserida: ${transaction.id}")
             }
 
             result
         } catch (e: Exception) {
-            Log.e(TAG, "Erro ao salvar transação ${transaction.id}: ${e.message}", e)
+            Log.e(TAG, "Erro ao salvar transação: ${e.message}", e)
             -1
         }
     }

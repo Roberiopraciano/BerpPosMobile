@@ -3,27 +3,25 @@ package br.com.berpsistemas.BerpPOSMobile.pagamento;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.Toast;
 
 import br.com.berpsistemas.BerpPOSMobile.model.PagamentoModel;
 import br.com.berpsistemas.BerpPOSMobile.model.TransactionModel;
 import br.com.berpsistemas.BerpPOSMobile.database.EnhancedTransactionManagerV2;
+import br.com.berpsistemas.BerpPOSMobile.Controller.Proxy;
+import br.com.berpsistemas.BerpPOSMobile.model.BerpModel;
+import br.com.berpsistemas.BerpPOSMobile.model.Variaveis;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 /**
- * PaymentCallbackHandler - VERSÃO UNIVERSAL
- * ADAPTADO PARA MODELO UNIVERSAL E CAMPOS ESSENCIAIS TEF/PIX
- *
- * COMPATIBILIDADE TOTAL:
- * ✅ Usa TransactionModel universal
- * ✅ Busca inteligente por múltiplos IDs
- * ✅ Salva usando saveUniversalCallback
- * ✅ Compatível com Stone, Zoop, Cielo, iFood
- * ✅ Tratamento de reimpressão e cancelamento
+ * PaymentCallbackHandler - VERSÃO UNIVERSAL COM SINCRONIZAÇÃO BACKEND
  */
 public class PaymentCallbackHandler implements IPaymentCallbackHandler {
     private static final String TAG = "UniversalPaymentCallbackHandler";
@@ -89,7 +87,6 @@ public class PaymentCallbackHandler implements IPaymentCallbackHandler {
 
     @Override
     public void handleCallback(Context context, Intent intent) {
-        // Inicializar transaction manager se necessário
         if (transactionManager == null) {
             initialize(context);
         }
@@ -100,7 +97,6 @@ public class PaymentCallbackHandler implements IPaymentCallbackHandler {
                 if (uri == null) throw new Exception("URI inválida");
                 Log.d(TAG, "Callback recebido: " + uri.toString());
 
-                // Detecção do tipo de callback
                 if (isRefundOrCancelCallback(uri)) {
                     handleRefundCallback(context, uri);
                     return;
@@ -121,9 +117,6 @@ public class PaymentCallbackHandler implements IPaymentCallbackHandler {
         }
     }
 
-    /**
-     * Detecta se é callback de cancelamento/estorno
-     */
     private boolean isRefundOrCancelCallback(Uri uri) {
         String uriString = uri.toString().toLowerCase();
         return uriString.contains("cancel") ||
@@ -132,9 +125,6 @@ public class PaymentCallbackHandler implements IPaymentCallbackHandler {
                 (uri.getScheme() != null && uri.getScheme().equals("berp") && uriString.contains("cancel"));
     }
 
-    /**
-     * Detecta se é callback de reimpressão
-     */
     private boolean isReprintCallback(Uri uri) {
         String uriString = uri.toString().toLowerCase();
         return uriString.contains("reprint") ||
@@ -142,9 +132,6 @@ public class PaymentCallbackHandler implements IPaymentCallbackHandler {
                 (uri.getScheme() != null && uri.getScheme().equals("berp") && uriString.contains("print"));
     }
 
-    /**
-     * Trata callback de reimpressão universal
-     */
     private void handleReprintCallback(Context context, Uri uri) {
         try {
             String result = uri.toString();
@@ -153,7 +140,6 @@ public class PaymentCallbackHandler implements IPaymentCallbackHandler {
             if (result.contains("SUCCESS")) {
                 Toast.makeText(context, "Reimpressão realizada com sucesso!", Toast.LENGTH_SHORT).show();
 
-                // Marcar como impresso no banco usando busca universal
                 String transactionId = uri.getQueryParameter("transaction_id");
                 if (transactionId != null && transactionManager != null) {
                     boolean marked = transactionManager.markReceiptPrinted(transactionId);
@@ -171,9 +157,6 @@ public class PaymentCallbackHandler implements IPaymentCallbackHandler {
         }
     }
 
-    /**
-     * Extrai mensagem de erro da impressão
-     */
     private String extractPrintError(String result) {
         if (result.contains("PRINTER_OUT_OF_PAPER")) return "Impressora sem papel";
         if (result.contains("PRINTER_INIT_ERROR")) return "Erro ao inicializar impressora";
@@ -187,12 +170,234 @@ public class PaymentCallbackHandler implements IPaymentCallbackHandler {
         return "Erro desconhecido";
     }
 
+    // ========== HANDLER UNIVERSAL DE ESTORNO COM SINCRONIZAÇÃO BACKEND ==========
+    private void handleRefundCallback(Context context, Uri uri) {
+        try {
+            // ---- Normalização de parâmetros vindos do deeplink ----
+            final String pSuccess = first(uri, "success");
+            final String pCode = first(uri, "code", "responsecode", "status_code");
+            final String pReason = first(uri, "reason", "message");
+            final String pAuthCode = first(uri, "authorizationcode", "authcode", "authorization_code");
+            final String pNsu = first(uri, "authorizationcode", "authcode", "authorization_code");
+            final String pOrderId = first(uri, "order_id", "orderid");
+            final String pTransactionId = first(uri, "atk", "transaction_id", "transactionid");
+            final String pPlatformId = first(uri, "atk", "platformid");
+
+            final String pAmountRaw = first(uri, "canceledamount", "amount", "transactionamount");
+            final java.math.BigDecimal amount = parseAmountFlexible(pAmountRaw);
+
+            final String pPaymentType = first(uri, "paymenttype", "payment_type");
+
+            final boolean success = parseSuccess(pSuccess, pCode, pReason);
+
+            Log.d(TAG, "=== CALLBACK DE CANCELAMENTO RECEBIDO ===");
+            Log.d(TAG, "success=" + pSuccess + ", code=" + pCode);
+            Log.d(TAG, "authCode=" + pAuthCode + ", nsu=" + pNsu);
+            Log.d(TAG, "orderId=" + pOrderId + ", transactionId=" + pTransactionId);
+            Log.d(TAG, "platformId=" + pPlatformId + ", amount=" + amount);
+
+            if (success) {
+                // 1) Recupera a transação original
+                TransactionModel originalTransaction = findOriginalTransactionUniversal(
+                        pOrderId, pTransactionId, pPlatformId
+                );
+
+                if (originalTransaction != null) {
+                    Log.d(TAG, "Transação original encontrada: " + originalTransaction.getTransactionId());
+
+                    // 2) Cancela LOCALMENTE
+                    boolean cancelOk = transactionManager.cancelTransaction(
+                            originalTransaction.getTransactionId(),
+                            "Estorno realizado - " + humanMsg(null, pReason, pCode)
+                    );
+                    Log.d(TAG, "Cancelamento local: " + cancelOk);
+
+                    if (cancelOk) {
+                        // 3) SINCRONIZAR COM BACKEND (NOVO)
+                        syncCancellationWithBackend(
+                                context,
+                                originalTransaction,
+                                pTransactionId,
+                                pNsu,
+                                pAuthCode,
+                                amount != null ? amount.toPlainString() : "0",
+                                pPlatformId,
+                                pOrderId,
+                                pPaymentType,
+                                pCode,
+                                pReason
+                        );
+                    } else {
+                        Toast.makeText(context,
+                                "Erro ao cancelar transação localmente",
+                                Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Log.w(TAG, "Transação original não encontrada para cancelamento");
+                    Toast.makeText(context,
+                            "Aviso: Transação não encontrada no banco local",
+                            Toast.LENGTH_LONG).show();
+                }
+
+            } else {
+                // ERRO/NEGADO
+                final String errorMsg = humanMsg(null, pReason, pCode);
+                Toast.makeText(context, "Erro no estorno: " + errorMsg, Toast.LENGTH_LONG).show();
+                notifyError(context, "Erro no estorno: " + errorMsg);
+            }
+
+        } catch (Exception e) {
+            Log.e(TAG, "Erro ao processar deeplink de estorno: " + e.getMessage(), e);
+            notifyError(context, "Erro ao processar estorno: " + e.getMessage());
+        }
+    }
+
     /**
-     * Processa callback de cancelamento/estorno universal
+     * NOVO: Sincroniza cancelamento com o backend
      */
+    private void syncCancellationWithBackend(
+            final Context context,
+            final TransactionModel originalTransaction,
+            final String transactionId,
+            final String nsu,
+            final String authCode,
+            final String amount,
+            final String platformId,
+            final String orderId,
+            final String paymentType,
+            final String code,
+            final String reason
+    ) {
+        // Mostrar feedback inicial
+        new Handler(Looper.getMainLooper()).post(() ->
+                Toast.makeText(context,
+                        "Sincronizando cancelamento com servidor...",
+                        Toast.LENGTH_SHORT).show()
+        );
 
+        // Executar em background
+        new Thread(() -> {
+            try {
+                // Gerar controle de duplicidade
+                String controle = BerpModel.ControleDuplicidade();
 
-    // ---------- HELPERS ----------
+                // Identificador para o backend (prioriza NSU)
+                String idParaBackend = nsu != null && !nsu.isEmpty() ? nsu :
+                        transactionId != null && !transactionId.isEmpty() ? transactionId :
+                                originalTransaction.getNsu();
+
+                Log.d(TAG, "=== SINCRONIZANDO COM BACKEND ===");
+                Log.d(TAG, "ID usado: " + idParaBackend);
+                Log.d(TAG, "Controle: " + controle);
+
+                // Chamar Proxy.deletePagamento
+                CompletableFuture<Boolean> future = Proxy.deletePagamento(nsu,transactionId,orderId, controle);
+
+                Boolean backendSuccess = future.get(15, java.util.concurrent.TimeUnit.SECONDS);
+
+                // Voltar para UI thread
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    if (backendSuccess != null && backendSuccess) {
+                        Log.d(TAG, "✓ Cancelamento sincronizado com sucesso no backend");
+
+//                        // Criar registro de estorno para auditoria
+//                        createUniversalRefundRecord(
+//                                originalTransaction,
+//                                amount,
+//                                platformId,
+//                                transactionId,
+//                                nsu
+//                        );
+
+                        // Criar modelo de pagamento cancelado para UI
+                        PagamentoModel pagCancelado = createUniversalCancelledPaymentModel(
+                                orderId, transactionId, platformId, amount
+                        );
+                        pagCancelado.setAutorizacao(authCode);
+                        pagCancelado.setRede(paymentType);
+                        pagCancelado.setNsu(nsu);
+
+                        Toast.makeText(context,
+                                "Estorno realizado e sincronizado com sucesso!",
+                                Toast.LENGTH_LONG).show();
+
+                        // Notificar listener
+                        if (paymentListener != null) {
+                            paymentListener.onRefundSuccess(pagCancelado);
+                        } else {
+                            Log.w(TAG, "Listener nulo, guardando em cache");
+                            cachedRefundSuccess = pagCancelado;
+                        }
+
+                    } else {
+                        Log.w(TAG, "⚠ Backend retornou false para cancelamento");
+                        handleBackendSyncFailure(context, originalTransaction,
+                                transactionId, nsu, authCode, amount,
+                                platformId, orderId, paymentType,
+                                "Servidor não confirmou o cancelamento");
+                    }
+                });
+
+            } catch (java.util.concurrent.TimeoutException e) {
+                Log.e(TAG, "✗ Timeout ao sincronizar com backend", e);
+                new Handler(Looper.getMainLooper()).post(() ->
+                        handleBackendSyncFailure(context, originalTransaction,
+                                transactionId, nsu, authCode, amount,
+                                platformId, orderId, paymentType,
+                                "Timeout ao conectar com servidor")
+                );
+
+            } catch (Exception e) {
+                Log.e(TAG, "✗ Erro ao sincronizar com backend: " + e.getMessage(), e);
+                new Handler(Looper.getMainLooper()).post(() ->
+                        handleBackendSyncFailure(context, originalTransaction,
+                                transactionId, nsu, authCode, amount,
+                                platformId, orderId, paymentType,
+                                "Erro: " + e.getMessage())
+                );
+            }
+        }).start();
+    }
+
+    /**
+     * NOVO: Trata falha na sincronização com backend
+     */
+    private void handleBackendSyncFailure(
+            Context context,
+            TransactionModel originalTransaction,
+            String transactionId,
+            String nsu,
+            String authCode,
+            String amount,
+            String platformId,
+            String orderId,
+            String paymentType,
+            String errorMsg
+    ) {
+        Log.w(TAG, "Falha na sincronização: " + errorMsg);
+
+        // Mesmo com falha no backend, notificar UI pois o cancelamento local foi feito
+        PagamentoModel pagCancelado = createUniversalCancelledPaymentModel(
+                orderId, transactionId, platformId, amount
+        );
+        pagCancelado.setAutorizacao(authCode);
+        pagCancelado.setRede(paymentType);
+        pagCancelado.setNsu(nsu);
+
+        Toast.makeText(context,
+                "Aviso: Cancelamento local OK, mas servidor não confirmou\n" + errorMsg,
+                Toast.LENGTH_LONG).show();
+
+        // Ainda assim notificar o listener (cancelamento local foi bem-sucedido)
+        if (paymentListener != null) {
+            paymentListener.onRefundSuccess(pagCancelado);
+        } else {
+            cachedRefundSuccess = pagCancelado;
+        }
+    }
+
+    // ========== MÉTODOS AUXILIARES ==========
+
     private String first(Uri uri, String... keys) {
         for (String k : keys) {
             final String v = uri.getQueryParameter(k);
@@ -220,17 +425,11 @@ public class PaymentCallbackHandler implements IPaymentCallbackHandler {
         return false;
     }
 
-    /**
-     * Converte amount de forma tolerante:
-     * - "100" => assume centavos (R$ 1,00) se for grande (>=1000)
-     * - "1.00" / "1,00" => reais
-     */
     private java.math.BigDecimal parseAmountFlexible(String raw) {
         if (raw == null || raw.isEmpty()) return java.math.BigDecimal.ZERO;
         String s = raw.trim().replace(",", ".");
         try {
             java.math.BigDecimal v = new java.math.BigDecimal(s);
-            // heurística: valores grandes provavelmente estão em centavos
             if (v.compareTo(new java.math.BigDecimal("1000")) >= 0) {
                 return v.movePointLeft(2);
             }
@@ -263,106 +462,9 @@ public class PaymentCallbackHandler implements IPaymentCallbackHandler {
         return sb.length() == 0 ? "Sem descrição" : sb.toString();
     }
 
-    // ---------- HANDLER UNIVERSAL ----------
-    private void handleRefundCallback(Context context, Uri uri) {
-        try {
-            // ---- Normalização de parâmetros vindos do deeplink ----
-            final String pSuccess = first(uri, "success"); // true/false (opcional)
-            final String pCode = first(uri, "code", "responsecode", "status_code");
-            final String pReason = first(uri, "reason", "message"); // alguns provedores usam reason como texto
-            final String pAuthCode = first(uri, "authorizationcode", "authcode", "authorization_code");
-
-            final String pOrderId = first(uri, "order_id", "orderid");
-            final String pTransactionId = first(uri, "transaction_id", "transactionid", "tid", "nsu");
-            final String pPlatformId = first(uri, "atk", "platformid"); // Stone/afins
-
-            // Valor: prioriza canceledamount -> amount -> transactionamount
-            final String pAmountRaw = first(uri, "canceledamount", "amount", "transactionamount");
-            final java.math.BigDecimal amount = parseAmountFlexible(pAmountRaw);
-
-            final String pPaymentType = first(uri, "paymenttype", "payment_type");
-
-            // Decide sucesso
-            final boolean success = parseSuccess(pSuccess, pCode, pReason);
-
-            // Melhor identificador para buscar a transação original no teu banco
-            final String orderIdBest = bestId(pOrderId, pTransactionId, pPlatformId);
-
-            Log.d(TAG, "Deeplink recebido: "
-                    + "success=" + pSuccess
-                    + ", code=" + pCode
-                    + ", reason=" + pReason
-                    + ", authCode=" + pAuthCode
-                    + ", orderId=" + pOrderId
-                    + ", transactionId=" + pTransactionId
-                    + ", platformId(atk)=" + pPlatformId
-                    + ", paymentType=" + pPaymentType
-                    + ", amountRaw=" + pAmountRaw
-                    + ", amount=" + amount);
-
-            if (success) {
-                // 1) Recupera a transação original (usa o que tiver disponível)
-                TransactionModel originalTransaction =
-                        findOriginalTransactionUniversal(pOrderId, pPlatformId, pPlatformId);
-
-                if (originalTransaction != null) {
-                    // 2) Cancela a transação original no teu gerenciador
-                    boolean cancelOk = transactionManager.cancelTransaction(
-                            originalTransaction.getTransactionId(),
-                            "Estorno realizado - " + humanMsg(null, pReason, pCode)
-                    );
-                    Log.d(TAG, "Transação original cancelada? " + cancelOk);
-
-                    // 3) Cria registro de estorno (auditoria)
-                    if (cancelOk) {
-                        // amount pode ser zero (alguns provedores mandam 0 no cancel)
-                        createUniversalRefundRecord(originalTransaction,
-                                amount != null ? amount.toPlainString() : "0",
-                                pPlatformId);
-                    }
-                } else {
-                    Log.w(TAG, "Transação original não encontrada para cancelamento. orderIdBest=" + orderIdBest);
-                }
-
-                // 4) Cria o modelo de pagamento cancelado para a UI/camada superior
-                PagamentoModel pagCancelado = createUniversalCancelledPaymentModel(
-                        pOrderId, pTransactionId, pPlatformId,
-                        amount != null ? amount.toPlainString() : "0"
-                );
-                // (opcional) preencher extras úteis
-                pagCancelado.setAutorizacao(pAuthCode);
-                pagCancelado.setRede(pPaymentType);
-
-                Toast.makeText(context, "Estorno realizado com sucesso!", Toast.LENGTH_LONG).show();
-
-                if (paymentListener != null) {
-                    paymentListener.onRefundSuccess(pagCancelado);
-                } else {
-                    Log.w(TAG, "paymentListener nulo. Guardando resultado do estorno.");
-                    cachedRefundSuccess = pagCancelado; // tua variável já existente
-                }
-
-            } else {
-                // ERRO/NEGADO
-                final String errorMsg = humanMsg(null, pReason, pCode);
-                Toast.makeText(context, "Erro no estorno: " + errorMsg, Toast.LENGTH_LONG).show();
-                notifyError(context, "Erro no estorno: " + errorMsg);
-            }
-
-        } catch (Exception e) {
-            Log.e(TAG, "Erro ao processar deeplink de estorno: " + e.getMessage(), e);
-            notifyError(context, "Erro ao processar estorno: " + e.getMessage());
-        }
-    }
-
-
-    /**
-     * BUSCA UNIVERSAL: Encontra transação por qualquer ID
-     */
     private TransactionModel findOriginalTransactionUniversal(String orderId, String transactionId, String platformId) {
         if (transactionManager == null) return null;
 
-        // Busca inteligente usando findTransactionById universal
         if (orderId != null && !orderId.isEmpty()) {
             TransactionModel transaction = transactionManager.findTransactionById(orderId);
             if (transaction != null) {
@@ -387,7 +489,6 @@ public class PaymentCallbackHandler implements IPaymentCallbackHandler {
             }
         }
 
-        // Fallback: última transação ativa
         TransactionModel lastTransaction = transactionManager.getLastTransaction();
         if (lastTransaction != null && lastTransaction.isApproved() && !lastTransaction.isCancelled()) {
             Log.d(TAG, "Usando última transação como fallback");
@@ -398,29 +499,34 @@ public class PaymentCallbackHandler implements IPaymentCallbackHandler {
         return null;
     }
 
-    /**
-     * Cria registro de estorno universal
-     */
-    private void createUniversalRefundRecord(TransactionModel originalTransaction, String refundAmount, String platformId) {
+    private void createUniversalRefundRecord(
+            TransactionModel originalTransaction,
+            String refundAmount,
+            String platformId,
+            String transactionCancel,
+            String nsu
+    ) {
         try {
             if (transactionManager == null) return;
 
-            // Calcular valor do estorno
             double refundValue = originalTransaction.getAmount();
             if (refundAmount != null && !refundAmount.isEmpty()) {
                 try {
-                    refundValue = Double.parseDouble(refundAmount) / 100.0;
+                    refundValue = Double.parseDouble(refundAmount);
                 } catch (NumberFormatException e) {
                     Log.w(TAG, "Erro ao converter valor do estorno, usando valor original");
                 }
             }
 
-            // Criar registro de estorno usando saveRefundTransaction
             boolean refundSaved = transactionManager.saveRefundTransaction(
-                    originalTransaction.getTransactionId(),
+                    transactionCancel,
                     refundValue,
                     "Estorno via callback - PlatformId: " + (platformId != null ? platformId : "N/A"),
-                    originalTransaction.getAcquirer()
+                    originalTransaction.getAcquirer(),
+                    transactionCancel,
+                    nsu,
+                    originalTransaction.getOrderId(),
+                    originalTransaction.getTransactionId()
             );
 
             Log.d(TAG, "Registro de estorno salvo: " + refundSaved);
@@ -430,14 +536,17 @@ public class PaymentCallbackHandler implements IPaymentCallbackHandler {
         }
     }
 
-    /**
-     * Cria modelo de pagamento cancelado universal
-     */
-    private PagamentoModel createUniversalCancelledPaymentModel(String orderId, String transactionId, String platformId, String amount) {
+    private PagamentoModel createUniversalCancelledPaymentModel(
+            String orderId,
+            String transactionId,
+            String platformId,
+            String amount
+    ) {
         PagamentoModel pagCancelado = new PagamentoModel();
 
         if (orderId != null) {
             pagCancelado.setIdOrder(orderId);
+            pagCancelado.setPgpCdusua(Variaveis.getUserId());
         }
 
         if (transactionId != null) {
@@ -450,7 +559,7 @@ public class PaymentCallbackHandler implements IPaymentCallbackHandler {
 
         if (amount != null && !amount.isEmpty()) {
             try {
-                double amountValue = Double.parseDouble(amount) / 100.0;
+                double amountValue = Double.parseDouble(amount);
                 pagCancelado.setPgpVlrpag(amountValue);
             } catch (NumberFormatException e) {
                 Log.w(TAG, "Erro ao converter valor do cancelamento");
@@ -463,12 +572,11 @@ public class PaymentCallbackHandler implements IPaymentCallbackHandler {
         return pagCancelado;
     }
 
-    /**
-     * Processa callback de pagamento universal
-     */
+    // ========== RESTANTE DOS MÉTODOS (handlePaymentCallback, etc) ==========
+    // ... (manter todo o resto do código como está)
+
     private void handlePaymentCallback(Context context, Uri uri) {
         try {
-            // Extrair parâmetros universais
             Map<String, String> callbackParams = extractUniversalCallbackParams(uri);
 
             Log.d(TAG, String.format(
@@ -489,43 +597,37 @@ public class PaymentCallbackHandler implements IPaymentCallbackHandler {
         }
     }
 
-    /**
-     * Extrai parâmetros universais do callback
-     */
     private Map<String, String> extractUniversalCallbackParams(Uri uri) {
         Map<String, String> params = new HashMap<>();
 
-        // Parâmetros universais de status
         params.put("code", uri.getQueryParameter("code"));
         params.put("success", uri.getQueryParameter("success"));
         params.put("message", uri.getQueryParameter("message"));
 
-        // Identificadores universais
         params.put("transactionId", getFirstNonNull(
-                uri.getQueryParameter("atk"),           // Stone ITK
-                uri.getQueryParameter("transactionId"), // Zoop/Generic
-                uri.getQueryParameter("tid")            // Cielo TID
+                uri.getQueryParameter("atk"),
+                uri.getQueryParameter("transactionId"),
+                uri.getQueryParameter("tid")
         ));
 
         params.put("nsu", getFirstNonNull(
-                uri.getQueryParameter("authorization_code"), // Stone
-                uri.getQueryParameter("authCode"),           // Zoop
-                uri.getQueryParameter("nsu")                 // Cielo
+                uri.getQueryParameter("authorization_code"),
+                uri.getQueryParameter("authCode"),
+                uri.getQueryParameter("nsu")
         ));
 
         params.put("orderId", getFirstNonNull(
-                uri.getQueryParameter("order_id"),     // Stone
-                uri.getQueryParameter("paymentId"),    // Zoop
-                uri.getQueryParameter("merchantOrderId") // Cielo
+                uri.getQueryParameter("order_id"),
+                uri.getQueryParameter("paymentId"),
+                uri.getQueryParameter("merchantOrderId")
         ));
 
         params.put("platformId", getFirstNonNull(
-                uri.getQueryParameter("atk"),          // Stone ATK
-                uri.getQueryParameter("cieloCode"),    // Zoop
-                uri.getQueryParameter("aid")           // Cielo AID
+                uri.getQueryParameter("atk"),
+                uri.getQueryParameter("cieloCode"),
+                uri.getQueryParameter("aid")
         ));
 
-        // Dados financeiros
         params.put("amount", uri.getQueryParameter("amount"));
         params.put("installments", getFirstNonNull(
                 uri.getQueryParameter("installment_count"),
@@ -533,7 +635,6 @@ public class PaymentCallbackHandler implements IPaymentCallbackHandler {
                 "1"
         ));
 
-        // Dados do cartão
         params.put("brand", uri.getQueryParameter("brand"));
         params.put("maskedPan", getFirstNonNull(
                 uri.getQueryParameter("pan"),
@@ -541,8 +642,6 @@ public class PaymentCallbackHandler implements IPaymentCallbackHandler {
                 uri.getQueryParameter("maskedCardNumber")
         ));
         params.put("cardholderName", uri.getQueryParameter("cardholder_name"));
-
-        // Tipo de transação
         params.put("paymentType", uri.getQueryParameter("type"));
 
         return params;
@@ -561,57 +660,27 @@ public class PaymentCallbackHandler implements IPaymentCallbackHandler {
         return "0".equals(code) || "true".equalsIgnoreCase(success);
     }
 
-    /**
-     * Processa pagamento bem-sucedido universal
-     */
     private void processSuccessfulPayment(Context context, Map<String, String> params) {
         try {
-            // Converter valor
             double amountReais = 0;
             String amountStr = params.get("amount");
             if (amountStr != null && !amountStr.isEmpty()) {
                 amountReais = Double.parseDouble(amountStr) / 100.0;
             }
 
-            // Mapear tipo de pagamento
             String paymentTypeCode = mapPaymentTypeToCode(params.get("paymentType"));
-
-            // Determinar adquirente baseado nos parâmetros
             String acquirer = determineAcquirer(params);
-
-            // Criar dados de callback universal
-            Map<String, Object> callbackData = new HashMap<>();
-            callbackData.put("transactionId", params.get("platformId"));
-            callbackData.put("nsu", params.get("nsu"));
-            callbackData.put("orderId", params.get("orderId"));
-            callbackData.put("platformId", params.get("itk"));
-            callbackData.put("amount", amountReais);
-            callbackData.put("acquirer", acquirer);
-            callbackData.put("type", params.get("type"));
-            callbackData.put("paymentTypeCode", paymentTypeCode);
-            callbackData.put("cardBrand", params.get("brand"));
-            callbackData.put("maskedPan", params.get("maskedPan"));
-            callbackData.put("cardholderName", params.get("cardholderName"));
-            callbackData.put("installments", Integer.parseInt(params.getOrDefault("installments", "1")));
-            callbackData.put("status", "APPROVED");
-            // A responsabilidade de salvar a transação foi movida para a PagamentoActivity
-            // para garantir o fluxo PENDING -> APPROVED e evitar duplicidade.
-            // if (transactionManager != null) {
-            //     boolean dbSaved = transactionManager.saveUniversalCallback(acquirer, callbackData);
-            //     Log.d(TAG, "Transação universal salva: " + dbSaved);
-            // }
 
             Toast.makeText(context,
                     String.format("Pagamento aprovado! Valor: R$ %.2f", amountReais),
                     Toast.LENGTH_LONG).show();
 
-            // Notificar listener usando dados universais
             if (paymentListener != null) {
                 paymentListener.onPaymentSuccess(
                         params.get("brand"),
                         params.get("nsu"),
                         params.get("maskedPan"),
-                        params.get("transactionId"),
+                        params.get("nsu"),
                         "",
                         acquirer,
                         params.get("platformId"),
@@ -633,7 +702,6 @@ public class PaymentCallbackHandler implements IPaymentCallbackHandler {
     }
 
     private String determineAcquirer(Map<String, String> params) {
-
         return "STONE";
     }
 
@@ -686,11 +754,8 @@ public class PaymentCallbackHandler implements IPaymentCallbackHandler {
         }
     }
 
-    // =================== MÉTODOS PÚBLICOS UNIVERSAIS ===================
+    // =================== MÉTODOS PÚBLICOS ===================
 
-    /**
-     * Obtém última transação universal
-     */
     public TransactionModel getLastTransaction(Context context) {
         if (transactionManager == null) {
             initialize(context);
@@ -698,9 +763,6 @@ public class PaymentCallbackHandler implements IPaymentCallbackHandler {
         return transactionManager != null ? transactionManager.getLastTransaction() : null;
     }
 
-    /**
-     * Obtém todas as transações por adquirente
-     */
     public List<TransactionModel> getTransactionsByAcquirer(Context context, String acquirer) {
         if (transactionManager == null) {
             initialize(context);
@@ -709,9 +771,6 @@ public class PaymentCallbackHandler implements IPaymentCallbackHandler {
                 new java.util.ArrayList<>();
     }
 
-    /**
-     * Verifica se pode cancelar transação
-     */
     public boolean canCancelTransaction(Context context, String transactionId) {
         if (transactionManager == null) {
             initialize(context);
@@ -719,9 +778,6 @@ public class PaymentCallbackHandler implements IPaymentCallbackHandler {
         return transactionManager != null && transactionManager.canCancelTransaction(transactionId);
     }
 
-    /**
-     * Marca comprovante como impresso
-     */
     public boolean markReceiptPrinted(Context context, String transactionId) {
         if (transactionManager == null) {
             initialize(context);
@@ -729,9 +785,6 @@ public class PaymentCallbackHandler implements IPaymentCallbackHandler {
         return transactionManager != null && transactionManager.markReceiptPrinted(transactionId);
     }
 
-    /**
-     * Obtém estatísticas universais
-     */
     public Map<String, Object> getTransactionStats(Context context) {
         if (transactionManager == null) {
             initialize(context);

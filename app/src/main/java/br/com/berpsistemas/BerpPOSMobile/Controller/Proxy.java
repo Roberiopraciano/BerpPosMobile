@@ -653,13 +653,16 @@ public class Proxy {
         return future;
     }
 
-    public static CompletableFuture<Boolean> deletePagamento(String idPagamento, String controle) {
+    public static CompletableFuture<Boolean> deletePagamento(String nsu,String autorizacao,String Id_venda, String controle) {
         CompletableFuture<Boolean> future = new CompletableFuture<>();
-        String url = new Funcoes().getUrl(Proxy.BASE_URL + "pagamento");
+        String url = new Funcoes().getUrl(Proxy.BASE_URL + "cancelPagto");
 
         JSONObject json = new JSONObject();
         try {
-            json.put("id_pagamento", idPagamento);
+            json.put("nsu", nsu);
+            json.put("autorizacao", autorizacao);
+            json.put("id_venda", Id_venda);
+
             json.put("controle", controle);
         } catch (Exception e) {
             future.completeExceptionally(e);
@@ -670,8 +673,13 @@ public class Proxy {
             @Override
             public void onSuccess(String response) {
                 try {
-                    boolean result = new JsonParser().resultBoolean(response);
-                    future.complete(result);
+                    int result = new JsonParser().resultInt(response);
+                    if (result==1){
+                        future.complete(true);
+                    }
+                    else{
+                        future.complete(false);
+                    }
                 } catch (Exception e) {
                     future.completeExceptionally(e);
                 }

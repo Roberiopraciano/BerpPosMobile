@@ -479,7 +479,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Variaveis.setTerminal_name(terminal.getNome());
                 Variaveis.setTerminal_id(terminal.getNumTerminal());
 
-// Verifica se o terminal e o status não são nulos
                 if (terminal != null && terminal.getStatus() != null) {
                     try {
                         // Verifica se o status não está vazio e é um número válido

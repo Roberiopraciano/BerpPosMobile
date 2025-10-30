@@ -328,6 +328,7 @@ public class PaymentCallbackHandler implements IPaymentCallbackHandler {
                 PagamentoModel pagCancelado = new PagamentoModel();
                 if (orderId != null) {
                     pagCancelado.setIdOrder(orderId);
+                    pagCancelado.setpgpcdusua(variaveis)
                 }
 
                 Toast.makeText(context, "Reembolso realizado com sucesso!", Toast.LENGTH_LONG).show();
